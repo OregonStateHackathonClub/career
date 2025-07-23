@@ -5,9 +5,11 @@ import Image from 'next/image'
 import Link from "next/link"
 import { Search, User } from "lucide-react"
 
+import prisma from "../../lib/prisma";
 import beaverHacksLogo from "../../public/beaverhacks_logo.jpg"
 import { Input } from "@/components/ui/input"
 
+console.log(prisma.user.findMany());
 
 // Mock user data
 const mockUsers = [
@@ -119,7 +121,6 @@ export default function UserDashboard() {
   const filteredUsers = useMemo(() => {
     return mockUsers.filter((user) => user.name.toLowerCase().includes(searchTerm.toLowerCase()))
   }, [searchTerm])
-
   // Calculate pagination
   const totalPages = Math.ceil(filteredUsers.length / ITEMS_PER_PAGE)
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
