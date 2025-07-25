@@ -1,15 +1,13 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useEffect, useMemo, useState } from "react"
 import Image from 'next/image'
 import Link from "next/link"
 import { Search, User } from "lucide-react"
 
-import prisma from "../../lib/prisma";
+import prisma from "@/lib/prisma";
 import beaverHacksLogo from "../../public/beaverhacks_logo.jpg"
 import { Input } from "@/components/ui/input"
-
-console.log(prisma.user.findMany());
 
 // Mock user data
 const mockUsers = [
@@ -116,10 +114,19 @@ const ITEMS_PER_PAGE = 8
 export default function UserDashboard() {
   const [searchTerm, setSearchTerm] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
+  const [users, setUsers] = useState(null)
+
+  useEffect(() => {
+    fetch('/api/get-all-users')
+      .then((res) => res.json())
+      .then((data) => {
+        setUsers(data.users)
+      })
+  }, [])
 
   // Filter users based on search term
   const filteredUsers = useMemo(() => {
-    return mockUsers.filter((user) => user.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    return users.filter((user) => user.name.toLowerCase().includes(searchTerm.toLowerCase()))
   }, [searchTerm])
   // Calculate pagination
   const totalPages = Math.ceil(filteredUsers.length / ITEMS_PER_PAGE)
@@ -183,8 +190,8 @@ export default function UserDashboard() {
               </div>
               <div className="flex-1">
                 <h3 className="font-bold text-lg mb-1">{user.name}</h3>
-                <p className="text-sm mb-1">College: {user.college}</p>
-                <p className="text-sm mb-3">Graduation: {user.graduation}</p>
+                <p className="text-sm mb-1">ID: {user.id}</p>
+                <p className="text-sm mb-1">Email: {user.email}</p>
                 <p className="text-sm leading-relaxed">{user.description}</p>
               </div>
             </div>
