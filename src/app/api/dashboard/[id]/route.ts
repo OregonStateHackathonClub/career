@@ -10,7 +10,7 @@ export async function GET(
   try {
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      include: { sessions: true, accounts: true },
+      include: { sessions: true },
     });
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
@@ -29,16 +29,27 @@ export async function POST(
   const userId = params.id;
   const body = await request.json();
   try {
-    const updatedUser = await prisma.user.update({
-      where: { id: userId },
-      data: {
-        name: body.name,
-        image: body.image,
-        email: body.email
-      },
-    });
-    return NextResponse.json(updatedUser);
+    let user;
+    try {
+      user = await prisma.user.update({
+        where: { id: userId },
+        data: {
+          name: body.name,
+          email: body.email
+        },
+      });
+    } catch (error) {
+      // If user not found, create it (let Prisma generate id)
+      user = await prisma.user.create({
+        data: {
+          name: body.name,
+          email: body.email,
+          googleId: body.googleId,
+        },
+      });
+    }
+    return NextResponse.json(user);
   } catch (error) {
-    return NextResponse.json({ error: 'Update failed' }, { status: 500 });
+    return NextResponse.json({ error: 'Update or create failed' }, { status: 500 });
   }
 }
