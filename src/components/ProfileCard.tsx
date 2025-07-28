@@ -5,11 +5,12 @@ type Project = {
   link: string;
 };
 
-type ProfileCardProps = {
+export type ProfileCardProps = {
   name: string;
   email: string;
   college: string;
   graduation: string;
+  userid: string;
   skills: string[];
   projects: Project[];
   resumeUrl: string;
@@ -27,12 +28,17 @@ function ProfileCard(props: ProfileCardProps) {
       </p>
       
       <p>Skills: {props.skills.join(", ")}</p>
+
+      <a href={props.resumeUrl} target="_blank" rel="noopener noreferrer">
+        {props.resumeUrl.split("/").pop() || "Download"}
+      </a>
       <p>
         Resume:{" "}
         <a href={props.resumeUrl} target="_blank" rel="noopener noreferrer">
           Download
         </a>
       </p>
+
       <p>
         Website:{" "}
         <a

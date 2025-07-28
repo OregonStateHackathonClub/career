@@ -7,25 +7,37 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Bold } from "lucide-react";
 
+// for the image part
+const MAX_FILE_SIZE = 5 * 1024 * 1024
+const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+
+const imageUploadSchema = z.instanceof(File)
+  .refine((file) => file.size <= MAX_FILE_SIZE, `Max image size is ${MAX_FILE_SIZE / (1024 * 1024)}MB.`)
+  .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type), "Only .jpg, jpeg, .png and .webp formats are supported.");
+
+
 const formSchema = z.object({
   name: z.string().min(2).max(50),
   email: z.string().email(),
   college: z.string().min(2).max(50),
   graduation: z.string().min(4).max(30),
+  userid: z.string().min(2).max(10),
   skills: z.string().min(1),
   projects: z.array(
     z.object({ name: z.string().min(1), link: z.string().url() })
   ),
   website: z.string().url({ message: "A valid URL is required." }).optional(),
   resume: z
-  .any()
-    .refine((files) => 
-      files && 
-    files.length === 1 &&
-      files[0]?.type === "application/pdf", {
-        message: "Please upload a pdf",
-    }),
-  });
+    .any()
+      .refine((files) => 
+        files && 
+      files.length === 1 &&
+        files[0]?.type === "application/pdf", {
+          message: "Please upload a pdf",
+      }),
+  profilepicture: imageUploadSchema.optional(),
+  
+});
   
   type FormData = z.infer<typeof formSchema>;
   
@@ -45,41 +57,45 @@ const formSchema = z.object({
     });
     
     const router = useRouter();
+
     const onSubmit = async (data: FormData) => {
-    // Prepare form data for the API
-    const formData = new FormData();
-    formData.append("resume", data.resume[0]);
+      // Prepare form data for the API
+      const formData = new FormData();
+      formData.append("resume", data.resume[0]);
 
-    
-    // Send to your API route
-    // const res = await fetch("/api/upload-resume", {
-    //   method: "POST",
-    //   body: formData,
-    // });
-
-    // const result = await res.json();
-    // if (result.url) {
-    //   alert("Resume uploaded! URL: " + result.url);
-    //   // You can now save this URL with the rest of the user data
-    // } else {
-    //   alert("Upload failed: " + result.error);
-    // }
-
-      //transform the skills into an array
+        //transform the skills into an array
       const skillsArray = data.skills.split(",").map((skill) => skill.trim());
       const userProfile = {
         name: data.name,
         email: data.email,
         college: data.college,
         graduation: data.graduation,
+        userid: data.userid,
         skills: skillsArray,
         projects: data.projects,
+        // profilepicture: data.profilepicture
       // resume: data.resume[0], // This will be handled when storage is ready
       };
 
-      // commenting this out because I cant push the data yet
-      // Passing the data as state
-      // router.push("/dashboard", { state: userProfile});
+        // Send to your API route
+      const res = await fetch(`/api/dashboard/${data.userid}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(userProfile),
+      });
+
+      const result = await res.json();
+      if (res.ok) {
+        // Save to localStorage and update state
+        localStorage.setItem("userProfile", JSON.stringify(result));
+        router.push("/dashboard");
+        console.log("User profile data to submit:", userProfile);
+        // You can now save this URL with the rest of the user data
+      } else {
+        alert(result.error || "Failed to save Profile");
+      }
+       
+
     };
 
   return (
@@ -120,6 +136,16 @@ const formSchema = z.object({
           </label>
         </div>
         <br />
+
+        <div className="form-group">
+          <label>
+            ID (school id):
+            <input type="text" {...register("userid")} className="form-input" />
+            {errors.userid && <p className="form-error">{errors.userid.message}</p>}
+          </label>
+        </div>
+        <br />
+        
         <div className="form-group">
           <label>
             Skills (comma separated):
@@ -128,6 +154,7 @@ const formSchema = z.object({
           </label>
         </div>
         <br />
+
         <div className="form-group">
           <label>
             Resume (PDF):
@@ -137,29 +164,40 @@ const formSchema = z.object({
           </label>
         </div>
         <br />
+
+        {/* <div className="form-group">
+          <label>
+            Profile Picture:
+            <input type="file" accept={ACCEPTED_IMAGE_TYPES.join(",")} {...register("profilepicture")} className="form-input" />
+            {errors.profilepicture && typeof errors.profilepicture.message == "string" && (
+              <p className="form-error">{errors.profilepicture.message}</p>
+            )}
+          </label>
+        </div> */}
+
         <div className="form-group">
-        <label>Projects:</label>
-        {fields.map((field, index) => (
-          <div key={field.id} className="project-fields">
-            <input
-              placeholder="Project Name"
-              {...register(`projects.${index}.name` as const)}
-              className="form-input"
-            />
-            <input
-              placeholder="Project Link"
-              {...register(`projects.${index}.link` as const)}
-              className="form-input"
-            />
-            <button type="button" onClick={() => remove(index)} className="remove-btn">
-              Remove
-            </button>
-            {errors.projects?.[index]?.name && (
-              <p className="form-error">{errors.projects[index]?.name?.message}</p>
-            )}
-            {errors.projects?.[index]?.link && (
-              <p className="form-error">{errors.projects[index]?.link?.message}</p>
-            )}
+          <label>Projects:</label>
+          {fields.map((field, index) => (
+            <div key={field.id} className="project-fields">
+              <input
+                placeholder="Project Name"
+                {...register(`projects.${index}.name` as const)}
+                className="form-input"
+              />
+              <input
+                placeholder="Project Link"
+                {...register(`projects.${index}.link` as const)}
+                className="form-input"
+              />
+              <button type="button" onClick={() => remove(index)} className="remove-btn">
+                Remove
+              </button>
+              {errors.projects?.[index]?.name && (
+                <p className="form-error">{errors.projects[index]?.name?.message}</p>
+              )}
+              {errors.projects?.[index]?.link && (
+                <p className="form-error">{errors.projects[index]?.link?.message}</p>
+              )}
           </div>
         ))}
         <button type="button" onClick={() => append({ name: "", link: "" })} className="add-btn">
