@@ -6,6 +6,7 @@ import { z } from "zod";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Bold } from "lucide-react";
+import { uploadFile } from "@/lib/storage";
 
 // for the image part
 const MAX_FILE_SIZE = 5 * 1024 * 1024
@@ -59,11 +60,14 @@ const formSchema = z.object({
     const router = useRouter();
 
     const onSubmit = async (data: FormData) => {
-      // Prepare form data for the API
-      const formData = new FormData();
-      formData.append("resume", data.resume[0]);
 
-        //transform the skills into an array
+      // Upload resume file
+      let resumePath = "";
+      if (data.resume && data.resume[0]) {
+        resumePath = await uploadFile(data.resume[0]);
+      }
+
+      //transform the skills into an array
       const skillsArray = data.skills.split(",").map((skill) => skill.trim());
       const userProfile = {
         name: data.name,
@@ -74,7 +78,7 @@ const formSchema = z.object({
         skills: skillsArray,
         projects: data.projects,
         // profilepicture: data.profilepicture
-      // resume: data.resume[0], // This will be handled when storage is ready
+        resumePath, // this is the blob
       };
 
         // Send to your API route
