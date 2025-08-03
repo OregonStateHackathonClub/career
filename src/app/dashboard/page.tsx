@@ -6,22 +6,49 @@ import ProfileCard from "@/components/ProfileCard";
 import { EditProfileForm } from "@/components/EditProfileForm";
 import type { ProfileCardProps } from "@/components/ProfileCard";
 
-const userId = "912345678"
+
+
 export default function Dashboard() {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [user, setUser] = useState<ProfileCardProps | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   useEffect(() => {
-    async function fetchUser() {
-      // USERID
-      const res = await fetch(`/api/dashboard/${userId}`);
-      if (res.ok) {
-        const user = await res.json();
-        setUser(user);
-      }
+    const profile = localStorage.getItem("userProfile");
+    if (profile) {
+      const parsed = JSON.parse(profile);
+      setUserId(parsed.userid || parsed.id);
+
+      console.log("Loaded userId from localStorage:", parsed.userid || parsed.id);
     }
-    fetchUser();
-  }, [editing]);      // reloading when editing changes
+}, []);
+
+useEffect(() => {
+  if (!userId) return;
+  async function fetchUser() {
+    const res = await fetch(`/api/dashboard/${userId}`);
+    console.log("Fetching user for userId:", userId, "Status:", res.status);
+    if (res.ok) {
+      const user = await res.json();
+      console.log("Fetched user from API:", user);
+      setUser({
+        name: user.name,
+        email: user.email,
+        college: user.college,
+        graduation: user.graduation,
+        userid: user.id || user.userid,
+        skills: user.skills,
+        projects: user.projects,
+        profilepictureUrl: user.image ? `/uploads/${user.image}` : undefined, 
+        resumeUrl: user.resumePath,
+        website: user.website,
+      });
+    } else {
+      console.log("API returned error status:", res.status);
+    }
+  }
+  fetchUser();
+}, [userId, editing]);
 
   return (
     <main className="p-10">
@@ -49,7 +76,4 @@ export default function Dashboard() {
   </main>
   );
 
-
-
- 
 }

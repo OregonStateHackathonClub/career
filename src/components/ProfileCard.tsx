@@ -14,33 +14,51 @@ export type ProfileCardProps = {
   skills: string[];
   projects: Project[];
   resumeUrl: string;
+  profilepictureUrl?: string;
   website?: string;
 };
 
 function ProfileCard(props: ProfileCardProps) {
   return (
-    <div className= "card">
-      <h2>{props.name}</h2>
-      <p> email: {props.email} </p>
+    <div className="card">
+      <div className="image-fields-container"> 
+        <div> 
+          <img 
+            src={props.profilepictureUrl}
+            alt={`${props.name}'s profile`}
+            style={{ width: 120, height: 120, borderRadius: "50 %"}}
+          />
+        </div>
 
-      <p>
-        College: {props.college} - {props.graduation}
+        <div className="card-img-left"> 
+          <h2 className="beaver-name">{props.name}</h2><br />
+          <p className="card-group">
+            <strong> Email: </strong> {props.email}
+          </p>
+
+          <p className="card-group">
+            <strong> College: </strong> {props.college} - {props.graduation} 
+          </p>
+        </div>
+
+      </div>
+
+      <p className="card-group">
+        <strong>Skills: </strong> {props.skills.join(", ")}</p>
+
+      <p className="card-group">
+        <strong>Resume:{" "}</strong>
+        {props.resumeUrl ? (
+          <a href={props.resumeUrl} target="_blank" rel="noopener noreferrer">
+            {props.resumeUrl.split("/").pop() || "Download"}
+          </a>
+        ) : (
+          "No resume uploaded"
+        )}
       </p>
-      
-      <p>Skills: {props.skills.join(", ")}</p>
 
-      <a href={props.resumeUrl} target="_blank" rel="noopener noreferrer">
-        {props.resumeUrl.split("/").pop() || "Download"}
-      </a>
-      <p>
-        Resume:{" "}
-        <a href={props.resumeUrl} target="_blank" rel="noopener noreferrer">
-          Download
-        </a>
-      </p>
-
-      <p>
-        Website:{" "}
+      <p className="card-group">
+        <strong>Website: {" "}</strong>
         <a
           href={`https://${props.website}`}
           target="_blank"
@@ -48,14 +66,16 @@ function ProfileCard(props: ProfileCardProps) {
         >
           {props.website}
         </a>
-      </p>
-      <div>
-        <h3>Projects:</h3>
+      </p >
+      
+      <div className="card-group">
+        <strong>Projects: </strong>
         <ul>
           {props.projects.map((project, idx) => (
-            <li key={idx}>
+            <li key={idx} style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+              <span> { project.name }</span>
               <a href={project.link} target="_blank" rel="noopener noreferrer">
-                {project.name}
+                {project.link}
               </a>
             </li>
           ))}

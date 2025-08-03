@@ -6,15 +6,22 @@ import { z } from "zod";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Bold } from "lucide-react";
-import { uploadFile } from "@/lib/storage";
 
 // for the image part
 const MAX_FILE_SIZE = 5 * 1024 * 1024
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
-const imageUploadSchema = z.instanceof(File)
-  .refine((file) => file.size <= MAX_FILE_SIZE, `Max image size is ${MAX_FILE_SIZE / (1024 * 1024)}MB.`)
-  .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type), "Only .jpg, jpeg, .png and .webp formats are supported.");
+const imageUploadSchema = z
+  .any()
+  .refine(
+    (files) => files && files.length === 1 && files[0] instanceof File,
+    "Input not instance of File"
+  )
+  .refine((files) => files && files[0]?.size <= MAX_FILE_SIZE,
+    `Max image size is ${MAX_FILE_SIZE / (1024 * 1024)}MB.`)
+  .refine((files) => files && ACCEPTED_IMAGE_TYPES.includes(files[0]?.type),
+    "Only .jpg, jpeg, .png and .webp formats are supported."
+  );
 
 
 const formSchema = z.object({
@@ -61,14 +68,48 @@ const formSchema = z.object({
 
     const onSubmit = async (data: FormData) => {
 
+      
+      
+      // upload profile picture
+      let profilepicturePath = ""
+      if (data.profilepicture && data.profilepicture[0]) {
+        const formData = new FormData();
+        formData.append("file", data.profilepicture[0]);
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+        if (!res.ok) {
+          alert("Failed to upload file");
+          return;
+        }
+        const result = await res.json();
+        profilepicturePath = result.fileName;
+
+      }
+      
       // Upload resume file
-      let resumePath = "";
+      let resumePath = ""
       if (data.resume && data.resume[0]) {
-        resumePath = await uploadFile(data.resume[0]);
+        const formData = new FormData();
+        formData.append("file", data.resume[0]);
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+        if (!res.ok) {
+          alert("Failed to upload file");
+          return;
+        }
+        const result = await res.json();
+        resumePath = result.fileName;
+
       }
 
-      //transform the skills into an array
+      //skills into an array
       const skillsArray = data.skills.split(",").map((skill) => skill.trim());
+
+      // Profile
       const userProfile = {
         name: data.name,
         email: data.email,
@@ -77,11 +118,11 @@ const formSchema = z.object({
         userid: data.userid,
         skills: skillsArray,
         projects: data.projects,
-        // profilepicture: data.profilepicture
-        resumePath, // this is the blob
+        profilepicturePath, // blob
+        resumePath, // blob
       };
 
-        // Send to your API route
+        // Send to API route
       const res = await fetch(`/api/dashboard/${data.userid}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -92,9 +133,10 @@ const formSchema = z.object({
       if (res.ok) {
         // Save to localStorage and update state
         localStorage.setItem("userProfile", JSON.stringify(result));
-        router.push("/dashboard");
-        console.log("User profile data to submit:", userProfile);
-        // You can now save this URL with the rest of the user data
+        console.log("Saved to localStorage:", result);
+        console.log("Saved userId:", result.userid || result.id);
+        window.location.href = "/dashboard";
+        // console.log("User profile data to submit:", userProfile);
       } else {
         alert(result.error || "Failed to save Profile");
       }
@@ -169,7 +211,7 @@ const formSchema = z.object({
         </div>
         <br />
 
-        {/* <div className="form-group">
+        <div className="form-group">
           <label>
             Profile Picture:
             <input type="file" accept={ACCEPTED_IMAGE_TYPES.join(",")} {...register("profilepicture")} className="form-input" />
@@ -177,7 +219,7 @@ const formSchema = z.object({
               <p className="form-error">{errors.profilepicture.message}</p>
             )}
           </label>
-        </div> */}
+        </div>
 
         <div className="form-group">
           <label>Projects:</label>
