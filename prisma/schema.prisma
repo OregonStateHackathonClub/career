@@ -18,6 +18,12 @@ model User {
   sessions      Session[]
   accounts      Account[]
 
+  college       String?
+  graduation    String?
+  skills        Json?    
+  projects      Json?    
+  resumePath    String?
+  website       String?
   @@unique([email])
   @@map("user")
 }
