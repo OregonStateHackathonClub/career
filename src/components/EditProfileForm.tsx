@@ -6,6 +6,7 @@ import { z } from "zod";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Bold } from "lucide-react";
+import { useEffect, useState } from "react";
 
 // for the image part
 const MAX_FILE_SIZE = 5 * 1024 * 1024
@@ -22,7 +23,6 @@ const imageUploadSchema = z
   .refine((files) => files && ACCEPTED_IMAGE_TYPES.includes(files[0]?.type),
     "Only .jpg, jpeg, .png and .webp formats are supported."
   );
-
 
 const formSchema = z.object({
   name: z.string().min(2).max(50),
@@ -44,32 +44,76 @@ const formSchema = z.object({
           message: "Please upload a pdf",
       }),
   profilepicture: imageUploadSchema.optional(),
-  
 });
   
-  type FormData = z.infer<typeof formSchema>;
+type FormData = z.infer<typeof formSchema>;
+
+export function EditProfileForm({ onCancel, userId }: { onCancel?: () => void; userId?: string }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const {
+    register,
+    control,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<FormData>({ 
+    resolver: zodResolver(formSchema), 
+    defaultValues: { projects: [{ name: "", link: ""}]}, // we're starting with one empty project
+  });
+
+  // field array for the projects
+  const {fields, append, remove } = useFieldArray({
+    control,
+    name: "projects",
+  });
   
-  export function EditProfileForm( { onCancel }: { onCancel?: ()=> void }) {
-    const {
-      register,
-      control,
-      handleSubmit,
-      formState: { errors },
-    } = useForm<FormData>({ resolver: zodResolver(formSchema), 
-      defaultValues: { projects: [{ name: "", link: ""}]}, // we're starting with one empty project
-    });
-    // field array for the projects
-    const {fields, append, remove } = useFieldArray({
-      control,
-      name: "projects",
-    });
+  const router = useRouter();
+
+  // Check if user exists and load their data
+  useEffect(() => {
+    const checkUserExists = async () => {
+      if (userId) {
+        setIsLoading(true);
+        try {
+          const res = await fetch(`/api/dashboard/${userId}`);
+          if (res.ok) {
+            const userData = await res.json();
+            setIsEditing(true);
+            
+            // Populate form with existing data
+            setValue("name", userData.name || "");
+            setValue("email", userData.email || "");
+            setValue("college", userData.college || "");
+            setValue("graduation", userData.graduation || "");
+            setValue("userid", userData.userid || userId);
+            setValue("skills", userData.skills?.join(", ") || "");
+            setValue("projects", userData.projects || [{ name: "", link: "" }]);
+            setValue("website", userData.website || "");
+            
+          } else if (res.status === 404) {
+            // User doesn't exist, we'll create them
+            setIsEditing(false);
+            if (userId) {
+              setValue("userid", userId);
+            }
+          }
+        } catch (error) {
+          console.error("Error checking user:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    checkUserExists();
+  }, [userId, setValue]);
+
+  const onSubmit = async (data: FormData) => {
+    setIsLoading(true);
     
-    const router = useRouter();
-
-    const onSubmit = async (data: FormData) => {
-
-      
-      
+    try {
       // upload profile picture
       let profilepicturePath = ""
       if (data.profilepicture && data.profilepicture[0]) {
@@ -80,12 +124,11 @@ const formSchema = z.object({
           body: formData,
         });
         if (!res.ok) {
-          alert("Failed to upload file");
+          alert("Failed to upload profile picture");
           return;
         }
         const result = await res.json();
         profilepicturePath = result.fileName;
-
       }
       
       // Upload resume file
@@ -98,18 +141,17 @@ const formSchema = z.object({
           body: formData,
         });
         if (!res.ok) {
-          alert("Failed to upload file");
+          alert("Failed to upload resume");
           return;
         }
         const result = await res.json();
         resumePath = result.fileName;
-
       }
 
       //skills into an array
       const skillsArray = data.skills.split(",").map((skill) => skill.trim());
 
-      // Profile
+      // Profile data
       const userProfile = {
         name: data.name,
         email: data.email,
@@ -120,11 +162,13 @@ const formSchema = z.object({
         projects: data.projects,
         profilepicturePath, // blob
         resumePath, // blob
+        ...(data.website && { website: data.website }), // only include if provided
       };
 
-        // Send to API route
+      // Use PUT for updates, POST for creation
+      const method = isEditing ? "PUT" : "POST";
       const res = await fetch(`/api/dashboard/${data.userid}`, {
-        method: "POST",
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(userProfile),
       });
@@ -133,31 +177,44 @@ const formSchema = z.object({
       if (res.ok) {
         // Save to localStorage and update state
         localStorage.setItem("userProfile", JSON.stringify(result));
-        console.log("Saved to localStorage:", result);
+        console.log(`${isEditing ? 'Updated' : 'Created'} user profile:`, result);
         console.log("Saved userId:", result.userid || result.id);
+        
+        // Show success message
+        alert(`Profile ${isEditing ? 'updated' : 'created'} successfully!`);
+        
+        // Redirect to dashboard
         window.location.href = "/dashboard";
-        // console.log("User profile data to submit:", userProfile);
       } else {
-        alert(result.error || "Failed to save Profile");
+        alert(result.error || `Failed to ${isEditing ? 'update' : 'create'} profile`);
       }
-       
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      alert("An error occurred while saving the profile");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    };
+  if (isLoading && !userId) {
+    return <div>Loading...</div>;
+  }
 
   return (
-
     <>
-      <h1 className="edit-profile-heading">Edit Profile</h1>
+      <h1 className="edit-profile-heading">
+        {isEditing ? "Edit Profile" : "Create Profile"}
+      </h1>
       <form onSubmit={handleSubmit(onSubmit)} className="edit-profile-form">
       
         <div className="form-group">
             <label>
               Name:
-              <input type="text" {...register("name")} className="form-input"
-              />
+              <input type="text" {...register("name")} className="form-input" />
               {errors.name && <p className="form-error">{errors.name.message}</p>}
             </label>
         </div>
+        
         <div className="form-group">
           <label>
             Email:
@@ -165,7 +222,7 @@ const formSchema = z.object({
             {errors.email && <p className="form-error">{errors.email.message}</p>}
           </label>
         </div>
-        <br />
+        
         <div className="form-group">
           <label>
             College:
@@ -173,7 +230,7 @@ const formSchema = z.object({
             {errors.college && <p className="form-error">{errors.college.message}</p>}
           </label>
         </div>
-        <br />
+        
         <div className="form-group">
           <label>
             Graduation (Spring 2027):
@@ -181,16 +238,19 @@ const formSchema = z.object({
             {errors.graduation && <p className="form-error">{errors.graduation.message}</p>}
           </label>
         </div>
-        <br />
 
         <div className="form-group">
           <label>
             ID (school id):
-            <input type="text" {...register("userid")} className="form-input" />
+            <input 
+              type="text" 
+              {...register("userid")} 
+              className="form-input"
+              readOnly={isEditing} // Don't allow changing ID when editing
+            />
             {errors.userid && <p className="form-error">{errors.userid.message}</p>}
           </label>
         </div>
-        <br />
         
         <div className="form-group">
           <label>
@@ -199,7 +259,14 @@ const formSchema = z.object({
             {errors.skills && <p className="form-error">{errors.skills.message}</p>}
           </label>
         </div>
-        <br />
+
+        <div className="form-group">
+          <label>
+            Website (optional):
+            <input type="url" {...register("website")} className="form-input"/>
+            {errors.website && <p className="form-error">{errors.website.message}</p>}
+          </label>
+        </div>
 
         <div className="form-group">
           <label>
@@ -209,7 +276,6 @@ const formSchema = z.object({
                  <p className="form-error">{errors.resume.message}</p> )}
           </label>
         </div>
-        <br />
 
         <div className="form-group">
           <label>
@@ -250,16 +316,18 @@ const formSchema = z.object({
           Add Project
         </button>
         </div>
+        
         <div className="form-actions">
-          <button type="submit" className="save-btn">Save</button>
+          <button type="submit" className="save-btn" disabled={isLoading}>
+            {isLoading ? "Saving..." : (isEditing ? "Update Profile" : "Create Profile")}
+          </button>
           {onCancel && (
-            <button type="button" onClick={onCancel} className="cancel-btn">
+            <button type="button" onClick={onCancel} className="cancel-btn" disabled={isLoading}>
               Cancel
             </button>
           )}
         </div>
       </form>
     </>
-      
   );
 }
