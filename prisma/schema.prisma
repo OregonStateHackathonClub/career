@@ -18,6 +18,8 @@ model User {
   sessions      Session[]
   accounts      Account[]
 
+  careerProfile CareerProfile?
+  
   @@unique([email])
   @@map("user")
 }
@@ -65,4 +67,26 @@ model Verification {
   updatedAt  DateTime?
 
   @@map("verification")
+}
+
+model CareerProfile {
+  id                   String    @id @default(cuid())
+  userId               String    @unique
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  studentId            String?
+  college              String?
+  graduation           String?
+  
+  skills               String[]
+  projects             Json[]
+  website              String?
+  
+  profilePicturePath   String?
+  resumePath           String?
+  
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  
+  @@map("career_profile")
 }
