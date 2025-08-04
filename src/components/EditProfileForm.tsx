@@ -1,11 +1,8 @@
-// Holds the form and manages changes to the Profile for the student
 "use client";
 
-import { useRouter } from "next/navigation"
 import { z } from "zod";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Bold } from "lucide-react";
 import { useEffect, useState } from "react";
 
 // for the image part
@@ -68,8 +65,6 @@ export function EditProfileForm({ onCancel, userId }: { onCancel?: () => void; u
     control,
     name: "projects",
   });
-  
-  const router = useRouter();
 
   // Check if user exists and load their data
   useEffect(() => {

@@ -1,15 +1,12 @@
 "use client"
-import { useRouter } from "next/navigation"
+
 import { useState, useEffect } from "react";
 import React from "react";
 import ProfileCard from "@/components/ProfileCard";
 import { EditProfileForm } from "@/components/EditProfileForm";
 import type { ProfileCardProps } from "@/components/ProfileCard";
 
-
-
 export default function Dashboard() {
-  const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [user, setUser] = useState<ProfileCardProps | null>(null);
   const [userId, setUserId] = useState<string | null>(null);

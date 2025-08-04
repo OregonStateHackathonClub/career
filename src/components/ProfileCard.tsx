@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 
 type Project = {
   name: string;
@@ -23,10 +24,12 @@ function ProfileCard(props: ProfileCardProps) {
     <div className="card">
       <div className="image-fields-container"> 
         <div> 
-          <img 
-            src={props.profilepictureUrl}
+          <Image 
+            className="size-30 rounded-full"
+            src={props.profilepictureUrl || ""}
             alt={`${props.name}'s profile`}
-            style={{ width: 120, height: 120, borderRadius: "50 %"}}
+            width={120}
+            height={120}
           />
         </div>
 
