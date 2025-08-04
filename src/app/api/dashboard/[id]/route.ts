@@ -4,9 +4,10 @@ import { NextResponse } from 'next/server';
 // GET: Fetch user dashboard data by user id
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const userId = params.id;
+  const { id: userId } = await params;
+
   try {
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -16,7 +17,8 @@ export async function GET(
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
     return NextResponse.json(user);
-  } catch (error) {
+  } catch (err) {
+    console.error(err)
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }
@@ -24,32 +26,31 @@ export async function GET(
 // POST: Update user dashboard data by user id
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const userId = params.id;
-  const body = await request.json();
+  const { id: userId } = await params;
+
   try {
-    let user;
-    try {
-      user = await prisma.user.update({
-        where: { id: userId },
-        data: {
-          name: body.name,
-          email: body.email
-        },
-      });
-    } catch (error) {
-      // If user not found, create it (let Prisma generate id)
-      user = await prisma.user.create({
-        data: {
-          name: body.name,
-          email: body.email,
-          googleId: body.googleId,
-        },
-      });
+    const body = await request.json();
+
+    if (!body.name && !body.email) {
+      return NextResponse.json(
+        { error: 'At least one field (name or email) is required' }, 
+        { status: 400 }
+      );
     }
+
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        name: body.name,
+        email: body.email
+      },
+    });
+
     return NextResponse.json(user);
-  } catch (error) {
+  } catch (err) {
+    console.error(err)
     return NextResponse.json({ error: 'Update or create failed' }, { status: 500 });
   }
 }
