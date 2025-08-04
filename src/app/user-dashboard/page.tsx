@@ -31,7 +31,7 @@ export default function UserDashboard() {
     if (searchTerm) 
       return users.filter((user) => user.name.toLowerCase().includes(searchTerm.toLowerCase()))
     else return users
-  }, [searchTerm])
+  }, [users, searchTerm])
 
   // Calculate pagination
   const totalPages = Math.ceil(filteredUsers.length / ITEMS_PER_PAGE)
