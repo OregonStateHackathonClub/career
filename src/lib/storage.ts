@@ -33,7 +33,7 @@ export const downloadFile = async(resumePath: string) =>{
   const [fileContents] = await file.download()
 
   return {
-    blob: new Blob([fileContents], { type: 'application/pdf' }),
+    buffer: fileContents,
     filename: resumePath
   };
 }

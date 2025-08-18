@@ -14,7 +14,7 @@ export async function GET(
         const file = bucket.file(filename);
         const [fileContents] = await file.download();
 
-        return new Response(fileContents, {
+        return new Response(new Uint8Array (fileContents), {
             headers: {
                 "Content-Type": "application/pdf",
                 "Content-Disposition": "inline; filename" + filename,
