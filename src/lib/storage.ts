@@ -1,6 +1,6 @@
 import { Storage } from "@google-cloud/storage"
 
-const storage = new Storage({
+export const storage = new Storage({
   projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
   credentials: {
     private_key: process.env.GOOGLE_CLOUD_PRIVATE_KEY?.replace(/\\n/g, '\n'),
@@ -8,9 +8,9 @@ const storage = new Storage({
   }
 })
 
-const bucket = storage.bucket(process.env.GOOGLE_CLOUD_BUCKET_NAME!)
+export const bucket = storage.bucket(process.env.GOOGLE_CLOUD_BUCKET_NAME!)
 
-export const uploadFile = async(file: File) => {
+export const uploadFile = async(file: File, isPublic: boolean) => {
 
   const fileName= `${Date.now()}-${file.name}`
   const blob = bucket.file(fileName)
@@ -20,10 +20,11 @@ export const uploadFile = async(file: File) => {
 
   await blob.save(buffer, {
     contentType: file.type,
-    public: false
+    public: isPublic
   })
 
-  return fileName
+  const publicUrl = `https://storage.googleapis.com/${process.env.GOOGLE_CLOUD_BUCKET_NAME}/${fileName}`;
+  return isPublic ? publicUrl : fileName;
 }
 
 export const downloadFile = async(resumePath: string) =>{
