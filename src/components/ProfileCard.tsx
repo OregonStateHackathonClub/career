@@ -52,9 +52,24 @@ function ProfileCard(props: ProfileCardProps) {
       <p className="card-group">
         <strong>Resume:{" "}</strong>
         {props.resumeUrl ? (
-          <a href={props.resumeUrl} target="_blank" rel="noopener noreferrer">
-            {props.resumeUrl.split("/").pop() || "Download"}
-          </a>
+          <>
+            <iframe
+              src={`/api/resume/${props.resumeUrl}`}
+              width="100%"
+              height="400px"
+              title="Resume Preview"
+              style={{ border: "1px solid #ccc", marginBottom: "1rem" }}
+            />
+            <a
+              href={`/api/resume/${props.resumeUrl}`}
+              download
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ display: "inline-block", marginTop: "0.5rem" }}
+            >
+              Download Resume
+            </a>
+          </>
         ) : (
           "No resume uploaded"
         )}

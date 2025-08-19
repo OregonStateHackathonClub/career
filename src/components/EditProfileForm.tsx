@@ -114,7 +114,7 @@ export function EditProfileForm({ onCancel, userId }: { onCancel?: () => void; u
       if (data.profilepicture && data.profilepicture[0]) {
         const formData = new FormData();
         formData.append("file", data.profilepicture[0]);
-        const res = await fetch("/api/upload", {
+        const res = await fetch("/api/upload/profile-picture", {
           method: "POST",
           body: formData,
         });
@@ -123,7 +123,7 @@ export function EditProfileForm({ onCancel, userId }: { onCancel?: () => void; u
           return;
         }
         const result = await res.json();
-        profilepicturePath = result.fileName;
+        profilepicturePath = result.publicUrl;
       }
       
       // Upload resume file
@@ -131,7 +131,7 @@ export function EditProfileForm({ onCancel, userId }: { onCancel?: () => void; u
       if (data.resume && data.resume[0]) {
         const formData = new FormData();
         formData.append("file", data.resume[0]);
-        const res = await fetch("/api/upload", {
+        const res = await fetch("/api/upload/resume", {
           method: "POST",
           body: formData,
         });
@@ -197,14 +197,14 @@ export function EditProfileForm({ onCancel, userId }: { onCancel?: () => void; u
 
   return (
     <>
-      <h1 className="edit-profile-heading">
+      <h1 className="edit-profile-heading text-white">
         {isEditing ? "Edit Profile" : "Create Profile"}
       </h1>
       <form onSubmit={handleSubmit(onSubmit)} className="edit-profile-form">
       
         <div className="form-group">
             <label>
-              Name:
+              <strong> Name:</strong> 
               <input type="text" {...register("name")} className="form-input" />
               {errors.name && <p className="form-error">{errors.name.message}</p>}
             </label>
@@ -212,7 +212,7 @@ export function EditProfileForm({ onCancel, userId }: { onCancel?: () => void; u
         
         <div className="form-group">
           <label>
-            Email:
+            <strong> Email:</strong> 
             <input type="text" {...register("email")} className="form-input"/>
             {errors.email && <p className="form-error">{errors.email.message}</p>}
           </label>
@@ -220,7 +220,7 @@ export function EditProfileForm({ onCancel, userId }: { onCancel?: () => void; u
         
         <div className="form-group">
           <label>
-            College:
+            <strong> College:</strong> 
             <input type="text" {...register("college")} className="form-input"/>
             {errors.college && <p className="form-error">{errors.college.message}</p>}
           </label>
@@ -228,7 +228,7 @@ export function EditProfileForm({ onCancel, userId }: { onCancel?: () => void; u
         
         <div className="form-group">
           <label>
-            Graduation (Spring 2027):
+            <strong> Graduation (Spring 2027):</strong> 
             <input type="text" {...register("graduation")} className="form-input" />
             {errors.graduation && <p className="form-error">{errors.graduation.message}</p>}
           </label>
@@ -236,7 +236,7 @@ export function EditProfileForm({ onCancel, userId }: { onCancel?: () => void; u
 
         <div className="form-group">
           <label>
-            ID (school id):
+            <strong> ID (school id):</strong>
             <input 
               type="text" 
               {...register("userid")} 
@@ -249,7 +249,7 @@ export function EditProfileForm({ onCancel, userId }: { onCancel?: () => void; u
         
         <div className="form-group">
           <label>
-            Skills (comma separated):
+            <strong> Skills (comma separated):</strong>
             <input type="text" {...register("skills")} className="form-input"/>
             {errors.skills && <p className="form-error">{errors.skills.message}</p>}
           </label>
@@ -257,7 +257,8 @@ export function EditProfileForm({ onCancel, userId }: { onCancel?: () => void; u
 
         <div className="form-group">
           <label>
-            Website (optional):
+            <strong> Website (optional):</strong>
+            
             <input type="url" {...register("website")} className="form-input"/>
             {errors.website && <p className="form-error">{errors.website.message}</p>}
           </label>
@@ -265,7 +266,7 @@ export function EditProfileForm({ onCancel, userId }: { onCancel?: () => void; u
 
         <div className="form-group">
           <label>
-            Resume (PDF):
+            <strong> Resume (PDF): </strong>
             <input type="file" accept="application/pdf" {...register("resume")} className="form-input"/>
             {errors.resume && typeof errors.resume.message === "string" && (
                  <p className="form-error">{errors.resume.message}</p> )}
@@ -274,7 +275,7 @@ export function EditProfileForm({ onCancel, userId }: { onCancel?: () => void; u
 
         <div className="form-group">
           <label>
-            Profile Picture:
+            <strong> Profile Picture:</strong>
             <input type="file" accept={ACCEPTED_IMAGE_TYPES.join(",")} {...register("profilepicture")} className="form-input" />
             {errors.profilepicture && typeof errors.profilepicture.message == "string" && (
               <p className="form-error">{errors.profilepicture.message}</p>
@@ -283,7 +284,9 @@ export function EditProfileForm({ onCancel, userId }: { onCancel?: () => void; u
         </div>
 
         <div className="form-group">
-          <label>Projects:</label>
+          <label>
+            <strong> Projects:</strong>
+          </label>
           {fields.map((field, index) => (
             <div key={field.id} className="project-fields">
               <input
@@ -313,14 +316,14 @@ export function EditProfileForm({ onCancel, userId }: { onCancel?: () => void; u
         </div>
         
         <div className="form-actions">
-          <button type="submit" className="save-btn" disabled={isLoading}>
-            {isLoading ? "Saving..." : (isEditing ? "Update Profile" : "Create Profile")}
-          </button>
           {onCancel && (
             <button type="button" onClick={onCancel} className="cancel-btn" disabled={isLoading}>
               Cancel
             </button>
           )}
+          <button type="submit" className="save-btn" disabled={isLoading}>
+            {isLoading ? "Saving..." : (isEditing ? "Update Profile" : "Create Profile")}
+          </button>
         </div>
       </form>
     </>

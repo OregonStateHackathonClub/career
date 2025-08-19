@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import React from "react";
+
 import ProfileCard from "@/components/ProfileCard";
 import { EditProfileForm } from "@/components/EditProfileForm";
 import type { ProfileCardProps } from "@/components/ProfileCard";
@@ -48,8 +49,8 @@ useEffect(() => {
 }, [userId, editing]);
 
   return (
-    <main className="p-10">
-      <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
+    <main className="dashboard-bg p-10">
+      <h1 className="text-3xl font-bold mb-6 text-white">Profile</h1>
       {editing ? (
         <EditProfileForm onCancel={() => setEditing(false)} />
       ) : (
@@ -58,7 +59,7 @@ useEffect(() => {
               <ProfileCard {...user} />
               
             ) : (
-                <p>No user profile found. Please edit your profile.</p>
+                <p className="text-white">No user profile found. Please edit your profile.</p>
             )
           }
             
