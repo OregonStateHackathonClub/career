@@ -8,7 +8,7 @@ export const storage = new Storage({
   }
 })
 
-export const bucket = storage.bucket(process.env.GOOGLE_CLOUD_BUCKET_NAME!)
+ const bucket = storage.bucket(process.env.GOOGLE_CLOUD_BUCKET_NAME!)
 
 export const uploadFile = async(file: File, isPublic: boolean) => {
 

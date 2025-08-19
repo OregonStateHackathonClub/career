@@ -1,26 +1,23 @@
 import { downloadFile } from "@/lib/storage";
 import { NextResponse } from "next/server";
-
-import { bucket } from "@/lib/storage";
 export const runtime = "nodejs";
 
 
 export async function GET(
     req: Request,
-    { params }: { params: { filename: string}}
+    context: { params: { filename: string } }
 ) {
-    const { filename } = params; 
+    const { filename } = context.params; 
     try {
-        const file = bucket.file(filename);
-        const [fileContents] = await file.download();
+        const { buffer } = await downloadFile(filename);
 
-        return new Response(new Uint8Array (fileContents), {
+        return new Response(new Uint8Array (buffer), {
             headers: {
                 "Content-Type": "application/pdf",
-                "Content-Disposition": "inline; filename" + filename,
+                "Content-Disposition": `inline; filename="${filename}"`,
             },
         });
-    } catch (error) {
+    } catch {
         return NextResponse.json({ error: "Resume not found" }, { status: 400 });
     }
 }
