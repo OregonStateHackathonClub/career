@@ -24,13 +24,16 @@ function ProfileCard(props: ProfileCardProps) {
     <div className="card">
       <div className="image-fields-container"> 
         <div> 
-          <Image 
+          {props.profilepictureUrl ? (
+            <Image 
             className="size-30 rounded-full"
             src={props.profilepictureUrl || ""}
             alt={`${props.name}'s profile`}
             width={120}
             height={120}
           />
+          ) : null }
+          
         </div>
 
         <div className="card-img-left"> 
