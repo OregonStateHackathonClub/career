@@ -72,7 +72,7 @@ export function EditProfileForm({ onCancel, userId }: { onCancel?: () => void; u
       if (userId) {
         setIsLoading(true);
         try {
-          const res = await fetch(`/api/dashboard/${userId}`);
+          const res = await fetch(`/api/user/${userId}`);
           if (res.ok) {
             const userData = await res.json();
             setIsEditing(true);
@@ -162,7 +162,7 @@ export function EditProfileForm({ onCancel, userId }: { onCancel?: () => void; u
 
       // Use PUT for updates, POST for creation
       const method = isEditing ? "PUT" : "POST";
-      const res = await fetch(`/api/dashboard/${data.userid}`, {
+      const res = await fetch(`/api/user/${data.userid}`, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(userProfile),

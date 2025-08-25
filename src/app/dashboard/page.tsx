@@ -24,7 +24,7 @@ export default function Dashboard() {
 useEffect(() => {
   if (!userId) return;
   async function fetchUser() {
-    const res = await fetch(`/api/dashboard/${userId}`);
+    const res = await fetch(`/api/user/${userId}`);
     console.log("Fetching user for userId:", userId, "Status:", res.status);
     if (res.ok) {
       const user = await res.json();
