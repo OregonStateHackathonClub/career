@@ -122,10 +122,16 @@
 }
 
 .card {
-  border: 3px solid #e0e0e0;
-  border-radius: 6px;
+  border: 3px solid #f5590b;
+  border-radius: 12px;
   max-width: 1000px;
-  margin: 1em;
+  margin: 2em auto;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08); 
+  padding: 2em; 
+  display: flex;
+  flex-direction:column;
+  align-items: center;
+  color: white;
   border-color: #f5590b;
 
 }
@@ -137,22 +143,28 @@
 
 }
 .edit-profile-heading {
-  font-size: 1.3rem;
-  font-weight: bold;
-  margin-top: 1rem;
-  color: white;
-
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 0.75rem;
 }
-.edit-profile-form{
-  max-width: 1000px;
-  margin: 2rem 0;
-  padding: 2rem;
-  background: #d1c2ba;
-  border-radius: 12px;
-  border: 3px solid #bb460b;
-  box-sizing: border-box;
 
+.edit-profile-form {
+  --form-bg: oklch(0.985 0 0);
+  --card-border: oklch(0.92 0 0);
+  --muted-fg: oklch(0.56 0 0);
+  --ring: #f5590b; /* Beaver orange accent */
+
+  max-width: 880px;
+  margin: 1.25rem 0 3rem;
+  padding: 1.5rem;
+  background: var(--form-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.06);
 }
+
+
 .form-group {
   margin-bottom: 0.5rem;
 }
@@ -170,9 +182,39 @@
 }
 
 .card-group {
-  margin-bottom: 0.5rem;
-  margin-left: 0.5rem;
+  margin-bottom: 0.75rem;
+  margin-left: 0;
   font-size: 1.5rem;
+}
+
+.card-group ul{
+  list-style: disc inside;
+
+}
+
+.card-group a{
+  text-decoration: underline;
+}
+
+.card-group iframe {
+  border: 1px solid #ccc;
+  margin-bottom: 1em;
+  border-radius: 8px;
+
+}
+
+.card-group a[download] {
+  display: inline-block;
+  margin-top: 0.5em;
+  padding: 0.5em 1em;
+  background: #2563eb;
+  color: #fff;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+}
+.card-group a[download]:hover {
+  background: #1d4ed8;
 }
 .form-input:focus{
   border-color: #bb460b;
@@ -231,9 +273,13 @@
 .beaver-name {
   font-size: 1.5rem;
   font-weight: bold;
+  margin-bottom: 0.5em;
 }
 
 .image-fields-container {
   display: flex;
-  gap: 10rem;
+  gap: 2.5rem;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 1.5rem;
 }

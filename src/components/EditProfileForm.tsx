@@ -201,129 +201,126 @@ export function EditProfileForm({ onCancel, userId }: { onCancel?: () => void; u
         {isEditing ? "Edit Profile" : "Create Profile"}
       </h1>
       <form onSubmit={handleSubmit(onSubmit)} className="edit-profile-form">
-      
-        <div className="form-group">
-            <label>
-              <strong> Name:</strong> 
-              <input type="text" {...register("name")} className="form-input" />
-              {errors.name && <p className="form-error">{errors.name.message}</p>}
-            </label>
-        </div>
-        
-        <div className="form-group">
-          <label>
-            <strong> Email:</strong> 
-            <input type="text" {...register("email")} className="form-input"/>
-            {errors.email && <p className="form-error">{errors.email.message}</p>}
-          </label>
-        </div>
-        
-        <div className="form-group">
-          <label>
-            <strong> College:</strong> 
-            <input type="text" {...register("college")} className="form-input"/>
-            {errors.college && <p className="form-error">{errors.college.message}</p>}
-          </label>
-        </div>
-        
-        <div className="form-group">
-          <label>
-            <strong> Graduation (Spring 2027):</strong> 
-            <input type="text" {...register("graduation")} className="form-input" />
-            {errors.graduation && <p className="form-error">{errors.graduation.message}</p>}
-          </label>
-        </div>
-
-        <div className="form-group">
-          <label>
-            <strong> ID (school id):</strong>
-            <input 
-              type="text" 
-              {...register("userid")} 
-              className="form-input"
-              readOnly={isEditing} // Don't allow changing ID when editing
-            />
-            {errors.userid && <p className="form-error">{errors.userid.message}</p>}
-          </label>
-        </div>
-        
-        <div className="form-group">
-          <label>
-            <strong> Skills (comma separated):</strong>
-            <input type="text" {...register("skills")} className="form-input"/>
-            {errors.skills && <p className="form-error">{errors.skills.message}</p>}
-          </label>
-        </div>
-
-        <div className="form-group">
-          <label>
-            <strong> Website (optional):</strong>
-            
-            <input type="url" {...register("website")} className="form-input"/>
-            {errors.website && <p className="form-error">{errors.website.message}</p>}
-          </label>
-        </div>
-
-        <div className="form-group">
-          <label>
-            <strong> Resume (PDF): </strong>
-            <input type="file" accept="application/pdf" {...register("resume")} className="form-input"/>
-            {errors.resume && typeof errors.resume.message === "string" && (
-                 <p className="form-error">{errors.resume.message}</p> )}
-          </label>
-        </div>
-
-        <div className="form-group">
-          <label>
-            <strong> Profile Picture:</strong>
-            <input type="file" accept={ACCEPTED_IMAGE_TYPES.join(",")} {...register("profilepicture")} className="form-input" />
-            {errors.profilepicture && typeof errors.profilepicture.message == "string" && (
-              <p className="form-error">{errors.profilepicture.message}</p>
-            )}
-          </label>
-        </div>
-
-        <div className="form-group">
-          <label>
-            <strong> Projects:</strong>
-          </label>
-          {fields.map((field, index) => (
-            <div key={field.id} className="project-fields">
-              <input
-                placeholder="Project Name"
-                {...register(`projects.${index}.name` as const)}
-                className="form-input"
-              />
-              <input
-                placeholder="Project Link"
-                {...register(`projects.${index}.link` as const)}
-                className="form-input"
-              />
-              <button type="button" onClick={() => remove(index)} className="remove-btn">
-                Remove
-              </button>
-              {errors.projects?.[index]?.name && (
-                <p className="form-error">{errors.projects[index]?.name?.message}</p>
-              )}
-              {errors.projects?.[index]?.link && (
-                <p className="form-error">{errors.projects[index]?.link?.message}</p>
-              )}
+        <div className="form-grid">
+          
+          <div className="form-group">
+              <label>
+                <strong> Name:</strong>
+                <input type="text" {...register("name")} className="form-input" />
+                {errors.name && <p className="form-error">{errors.name.message}</p>}
+              </label>
           </div>
-        ))}
-        <button type="button" onClick={() => append({ name: "", link: "" })} className="add-btn">
-          Add Project
-        </button>
-        </div>
-        
-        <div className="form-actions">
-          {onCancel && (
-            <button type="button" onClick={onCancel} className="cancel-btn" disabled={isLoading}>
-              Cancel
-            </button>
-          )}
-          <button type="submit" className="save-btn" disabled={isLoading}>
-            {isLoading ? "Saving..." : (isEditing ? "Update Profile" : "Create Profile")}
+          
+          <div className="form-group">
+            <label>
+              <strong> Email:</strong>
+              <input type="text" {...register("email")} className="form-input"/>
+              {errors.email && <p className="form-error">{errors.email.message}</p>}
+            </label>
+          </div>
+          
+          <div className="form-group">
+            <label>
+              <strong> College:</strong>
+              <input type="text" {...register("college")} className="form-input"/>
+              {errors.college && <p className="form-error">{errors.college.message}</p>}
+            </label>
+          </div>
+          
+          <div className="form-group">
+            <label>
+              <strong> Graduation (Spring 2027):</strong>
+              <input type="text" {...register("graduation")} className="form-input" />
+              {errors.graduation && <p className="form-error">{errors.graduation.message}</p>}
+            </label>
+          </div>
+          <div className="form-group">
+            <label>
+              <strong> ID (school id):</strong>
+              <input
+                type="text"
+                {...register("userid")}
+                className="form-input"
+                readOnly={isEditing} // Don't allow changing ID when editing
+              />
+              {errors.userid && <p className="form-error">{errors.userid.message}</p>}
+            </label>
+          </div>
+          
+          <div className="form-group">
+            <label>
+              <strong> Skills (comma separated):</strong>
+              <input type="text" {...register("skills")} className="form-input"/>
+              {errors.skills && <p className="form-error">{errors.skills.message}</p>}
+            </label>
+          </div>
+          <div className="form-group">
+            <label>
+              <strong> Website (optional):</strong>
+          
+              <input type="url" {...register("website")} className="form-input"/>
+              {errors.website && <p className="form-error">{errors.website.message}</p>}
+            </label>
+          </div>
+          <div className="form-group">
+            <label>
+              <strong> Resume (PDF): </strong>
+              <input type="file" accept="application/pdf" {...register("resume")} className="form-input"/>
+              {errors.resume && typeof errors.resume.message === "string" && (
+                   <p className="form-error">{errors.resume.message}</p> )}
+            </label>
+          </div>
+          <div className="form-group">
+            <label>
+              <strong> Profile Picture:</strong>
+              <input type="file" accept={ACCEPTED_IMAGE_TYPES.join(",")} {...register("profilepicture")} className="form-input" />
+              {errors.profilepicture && typeof errors.profilepicture.message == "string" && (
+                <p className="form-error">{errors.profilepicture.message}</p>
+              )}
+            </label>
+          </div>
+          <div className="form-group">
+            <label>
+              <strong> Projects:</strong>
+            </label>
+            {fields.map((field, index) => (
+              <div key={field.id} className="project-fields">
+                <input
+                  placeholder="Project Name"
+                  {...register(`projects.${index}.name` as const)}
+                  className="form-input"
+                />
+                <input
+                  placeholder="Project Link"
+                  {...register(`projects.${index}.link` as const)}
+                  className="form-input"
+                />
+                <button type="button" onClick={() => remove(index)} className="remove-btn">
+                  Remove
+                </button>
+                {errors.projects?.[index]?.name && (
+                  <p className="form-error">{errors.projects[index]?.name?.message}</p>
+                )}
+                {errors.projects?.[index]?.link && (
+                  <p className="form-error">{errors.projects[index]?.link?.message}</p>
+                )}
+            </div>
+          ))}
+          <button type="button" onClick={() => append({ name: "", link: "" })} className="add-btn">
+            Add Project
           </button>
+          </div>
+          
+          <div className="form-actions">
+            {onCancel && (
+              <button type="button" onClick={onCancel} className="cancel-btn" disabled={isLoading}>
+                Cancel
+              </button>
+            )}
+            <button type="submit" className="save-btn" disabled={isLoading}>
+              {isLoading ? "Saving..." : (isEditing ? "Update Profile" : "Create Profile")}
+            </button>
+          </div>
         </div>
       </form>
     </>
