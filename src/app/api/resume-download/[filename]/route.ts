@@ -5,9 +5,9 @@ export const runtime = "nodejs";
 
 export async function GET(
     req: Request,
-    context: { params: { filename: string } }
+    { params }: { params: Promise<{ filename: string }> }
 ) {
-    const { filename } = context.params; 
+    const { filename } = await params; 
     try {
         const { buffer } = await downloadFile(filename);
 

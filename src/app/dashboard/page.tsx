@@ -7,8 +7,7 @@ import React from "react";
 import ProfileCard from "@/components/ProfileCard";
 import { EditProfileForm } from "@/components/EditProfileForm";
 import type { ProfileCardProps } from "@/components/ProfileCard";
-import Link from "next/link"
-import Image from "next/image"
+
 
 export default function Dashboard() {
   const [editing, setEditing] = useState(false);
@@ -56,36 +55,7 @@ export default function Dashboard() {
 
   return (
     <>
-      {/* Navigation bar */}
-      <header className="flex items-center justify-between p-6 bg-black">
-        <Link href="/" className="flex items-center gap-3">
-          <div className="flex items-center gap-3">
-            <img
-              src="/beaverhacks_logo.jpg"
-              alt="BeaverHacks Logo"
-              className="h-15 w-15 rounded"
-            />
-            <div>
-              <span className="font-bold uppercase block text-2xl text-white">BEAVERHACKS</span>
-              <span className="font-bold uppercase block text-2xl text-white">CAREER</span>
-            </div>
-          </div>
-        </Link>
-
-        <nav className="flex items-center gap-8">
-          <Link href="/discover" className="text-white hover:text-gray-300 transition-colors">
-            Discover
-          </Link>
-          <Link href="/profile" className="text-white hover:text-gray-300 transition-colors">
-            Profile
-          </Link>
-
-          <Link href="/logout" className="text-white hover:text-gray-300 transition-colors">
-            Logout
-          </Link>
-        </nav>
-      </header>
-
+      <Navbar />
 
       <main className="dashboard-bg p-4 pl-10">
         <h1 className="text-3xl font-bold mb-6 text-white">Profile</h1>

@@ -13,9 +13,9 @@ export default function Navbar () {
         </div>
       </Link>
       <nav className="flex items-center gap-8">
-        <Link href="/discover" className="text-white">Discover</Link>
-        <Link href="/profile" className="text-white">Profile</Link>
-        <Link href="/logout" className="text-white">Logout</Link>
+        <Link href="/user-dashboard" className="text-white">Discover</Link>
+        <Link href="/dashboard" className="text-white">Profile</Link>
+        <Link href="/signup" className="text-white">SignUp/SignIn</Link>
       </nav>
     </header>
   );
