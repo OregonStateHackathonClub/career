@@ -15,7 +15,7 @@ export async function GET(
   try {
     // TODO
     const user = await prisma.user.findUnique({
-      where: { id: "122334489" }
+      where: { id: "" }
     })
     
     

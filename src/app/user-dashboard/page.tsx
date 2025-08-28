@@ -5,10 +5,10 @@ import Image from 'next/image'
 import Link from "next/link"
 import { Search, User } from "lucide-react"
 
-import beaverHacksLogo from "../../public/beaverhacks_logo.jpg"
 import { Input } from "@/components/ui/input"
 import { User as UserType } from "@prisma/client"
 
+const beaverHacksLogo = "/beaverhacks_logo.jpg";
 const ITEMS_PER_PAGE = 8
 
 export default function UserDashboard() {

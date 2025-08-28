@@ -124,14 +124,14 @@
 .card {
   border: 3px solid #f5590b;
   border-radius: 12px;
-  max-width: 600px;
+  max-width: 1000px;
   margin: 2em auto;
   box-shadow: 0 4px 24px rgba(0,0,0,0.08); 
   padding: 2em; 
   display: flex;
   flex-direction:column;
   align-items: center;
-
+  color: white;
   border-color: #f5590b;
 
 }
@@ -143,22 +143,28 @@
 
 }
 .edit-profile-heading {
-  font-size: 1.3rem;
-  font-weight: bold;
-  margin-top: 1rem;
-  color: white;
-
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 0.75rem;
 }
-.edit-profile-form{
-  max-width: 1000px;
-  margin: 2rem 0;
-  padding: 2rem;
-  background: #d1c2ba;
-  border-radius: 12px;
-  border: 3px solid #bb460b;
-  box-sizing: border-box;
 
+.edit-profile-form {
+  --form-bg: oklch(0.985 0 0);
+  --card-border: oklch(0.92 0 0);
+  --muted-fg: oklch(0.56 0 0);
+  --ring: #f5590b; /* Beaver orange accent */
+
+  max-width: 880px;
+  margin: 1.25rem 0 3rem;
+  padding: 1.5rem;
+  background: var(--form-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.06);
 }
+
+
 .form-group {
   margin-bottom: 0.5rem;
 }
@@ -183,7 +189,6 @@
 
 .card-group ul{
   list-style: disc inside;
-  margin-left: 1rem;
 
 }
 
