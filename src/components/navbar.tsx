@@ -1,22 +1,29 @@
-import Link from "next/link";
-import Image from "next/image";
+import Image from 'next/image'
+import Link from "next/link"
 
-export default function Navbar () {
+import beaverHacksLogo from "../public/beaverhacks_logo.jpg"
+
+export const Navbar = () => {
   return (
-  
-      <header className="flex items-center justify-between p-4 bg-black">
+    <header className="flex items-center justify-between p-6">
       <Link href="/" className="flex items-center gap-3">
-        <Image src="/beaverhacks_logo.jpg" width={48} height={48} alt="BeaverHacks Logo" />
+        <div className="w-12 h-12 flex items-center justify-center">
+          <Image src={beaverHacksLogo} width={64} height={64} alt="BeaverHacks Logo" />
+        </div>
         <div>
-          <span className="font-bold uppercase block text-white text-xl">BEAVERHACKS</span>
-          <span className="font-bold uppercase block text-white text-xl">CAREER</span>
+          <div className="text-lg font-bold">BEAVERHACKS</div>
+          <div className="text-lg font-bold">CAREER</div>
         </div>
       </Link>
+
       <nav className="flex items-center gap-8">
-        <Link href="/user-dashboard" className="text-white">Discover</Link>
-        <Link href="/dashboard" className="text-white">Profile</Link>
-        <Link href="/signup" className="text-white">SignUp/SignIn</Link>
+        <Link href="/user-dashboard" className="text-lg hover:text-gray-300 transition-colors">
+          Discover
+        </Link>
+        <Link href="/profile" className="text-lg hover:text-gray-300 transition-colors">
+          Profile
+        </Link>
       </nav>
     </header>
-  );
+  )
 }
