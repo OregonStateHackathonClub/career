@@ -23,7 +23,7 @@ function ProfileCard(props: ProfileCardProps) {
   return (
     <div className="card">
       <div className="image-fields-container"> 
-        <div> 
+         <div> 
           {props.profilepictureUrl ? (
             <Image 
             className="size-30 rounded-full"
@@ -56,21 +56,24 @@ function ProfileCard(props: ProfileCardProps) {
         <strong>Resume:{" "}</strong>
         {props.resumeUrl ? (
           <>
-            <iframe
-              src={`/api/resume/${props.resumeUrl}`}
-              width="100%"
-              height="400px"
-              title="Resume Preview"
-              style={{ border: "1px solid #ccc", marginBottom: "1rem" }}
-            />
+             {/* Display a friendly file name and link to the preview section */}
             <a
-              href={`/api/resume/${props.resumeUrl}`}
-              download
+              href={`#resume-preview`}                // <-- jump to the preview below
+              className="resume-inline-link"
+              title="View resume preview below"
+            >
+              {decodeURIComponent(props.resumeUrl).replace(/^[0-9]+-/, "")}
+            </a>
+
+            {/* Optional: external download too */}
+            <span className="resume-sep"> · </span>
+            <a
+              href={`/api/resume-download/${encodeURIComponent(props.resumeUrl)}`}
               target="_blank"
               rel="noopener noreferrer"
-              style={{ display: "inline-block", marginTop: "0.5rem" }}
+              className="resume-inline-link"
             >
-              Download Resume
+              Download
             </a>
           </>
         ) : (
