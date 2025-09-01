@@ -5,15 +5,21 @@ import { Search, User } from "lucide-react"
 
 import { Navbar } from "@/components/navbar";
 import { Input } from "@/components/ui/input"
-import { CareerProfile as CareerProfileType } from "@prisma/client"
 
-const beaverHacksLogo = "/beaverhacks_logo.jpg";
+import { CareerProfile } from "@prisma/client"
+
+// Interface for the user object which has the CareerProfile info of a user, 
+// as well as some other attributes not in CareerProfile
+interface User extends CareerProfile {
+  name: string
+}
+
 const ITEMS_PER_PAGE = 8
 
 export default function UserDashboard() {
   const [searchTerm, setSearchTerm] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
-  const [users, setUsers] = useState<CareerProfileType[] | null>(null)
+  const [users, setUsers] = useState<User[] | null>(null)
 
   useEffect(() => {
     fetch('/api/get-all-users')
@@ -69,6 +75,7 @@ export default function UserDashboard() {
         {/* Profile Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           {currentUsers.map((user) => {
+            console.log(user)
             let resumePath;
             
             fetch(`/api/resume-download/${user.resumePath}`)

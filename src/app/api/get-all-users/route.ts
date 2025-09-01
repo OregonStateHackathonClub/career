@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 export async function GET() {
   try {
     const users = await prisma.user.findMany({ include: { careerProfile: true } });
-    const careerProfiles: Object[] = [];
+    const careerProfiles: object[] = [];
 
     users.forEach(user => {
       if (!user.careerProfile)

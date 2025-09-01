@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
-import  Navbar from "@/components/navbar";
+import { Navbar } from "@/components/navbar";
 
 export default function SignUpPage() {
     const [name, setName] = useState("");

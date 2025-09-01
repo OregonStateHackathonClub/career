@@ -1,14 +1,11 @@
 "use client";
-
-
-import  Navbar from "@/components/navbar";
+import { Navbar } from "@/components/navbar";
 
 export default function SignInPage() {
 
     return (
         <>
-            <Navbar />
-        
+            <Navbar />  
         </>
     )
 }
