@@ -66,7 +66,7 @@ export default function Dashboard() {
               <>
                 <ProfileCard {...user} />
                 {user.resumeUrl && (
-                  <div className="mt-8 bg-white rounded shadow p-6">
+                  <div id="resume-preview"className="mt-8 bg-white rounded shadow p-6">
                     {/* Resume section */}
                     <h2 className="text-xl font-semibold mb-4 text-gray-800">
                       Resume
