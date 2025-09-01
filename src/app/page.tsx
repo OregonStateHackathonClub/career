@@ -1,10 +1,10 @@
-import  Navbar from "@/components/navbar";
+import { Navbar } from "@/components/navbar";
 
 export default function Home() {
   return (
-    <div>
+    <div className="min-h-screen bg-black text-white">
       <Navbar />
-      <div>hey everyone</div>
+      <div className="px-6 text-center text-4xl">hey everyone</div>
     </div>
   );
 }

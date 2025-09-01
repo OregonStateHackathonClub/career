@@ -1,7 +1,5 @@
 "use client";
-
-
-import  Navbar from "@/components/navbar";
+import { Navbar } from "@/components/navbar";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -17,8 +15,7 @@ export default function SignInPage() {
     
     return (
         <>
-            <Navbar />
-        
+            <Navbar />  
         </>
     )
 }
