@@ -1,4 +1,4 @@
-import { uploadFile } from "@/lib/storage";
+import { uploadProfilePicture } from "@/lib/storage";
 export const runtime = "nodejs";
 
 export async function POST(req: Request) {
@@ -6,6 +6,6 @@ export async function POST(req: Request) {
     const file = formData.get("file") as File;
     if (!file) return new Response("No file", { status: 400 });
 
-    const publicUrl = await uploadFile(file, true);
-    return Response.json({ publicUrl })
+    const { fileName, url } = await uploadProfilePicture(file);
+    return Response.json({ fileName, url });
 }
