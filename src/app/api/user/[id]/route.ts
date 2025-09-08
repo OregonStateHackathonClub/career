@@ -16,7 +16,6 @@ export async function GET(
     return NextResponse.json({ eror: "Unauthorized" }, { status: 401 });
   }
 
-
   const userId = session.user.id;
   
   try {
@@ -24,7 +23,6 @@ export async function GET(
     const user = await prisma.user.findUnique({
       where: { id: userId },
     });
-    
     
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
@@ -43,7 +41,23 @@ export async function GET(
       return NextResponse.json({ error: 'Career profile not found' }, { status: 404 });
     }
     
-    return NextResponse.json(careerProfile);
+     const responseData = {
+      // Career profile fields
+      ...careerProfile,
+      name: careerProfile.user.name,
+      email: careerProfile.user.email,
+      userid: careerProfile.studentId, // Map studentId to userid for frontend compatibility
+      college: careerProfile.college,
+      graduation: careerProfile.graduation,
+      skills: careerProfile.skills,
+      projects: careerProfile.projects,
+      website: careerProfile.website,
+      profilePicturePath: careerProfile.profilePicturePath,
+      resumePath: careerProfile.resumePath,
+      user: undefined
+    };
+    
+    return NextResponse.json(responseData);
   } catch (error) {
     console.error('Database error:', error);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });

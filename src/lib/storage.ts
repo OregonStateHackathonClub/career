@@ -48,11 +48,23 @@ export const uploadProfilePicture = async (file: File) => {
 
   await blob.save(buffer, { contentType: file.type });
 
-  // Return a signed URL or permanent public URL
+  // Returning a signed URL
   const [url] = await blob.getSignedUrl({
     action: 'read',
     expires: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
   });
 
   return { fileName, url };
+};
+
+// Helper to generate signed URL for an existing file
+export const getSignedUrl = async (fileName: string, expiresInHours = 24) => {
+  const file = bucket.file(fileName);
+
+  const [url] = await file.getSignedUrl({
+    action: 'read',
+    expires: Date.now() + expiresInHours * 60 * 60 * 1000, // default 24 hours
+  });
+
+  return url;
 };
