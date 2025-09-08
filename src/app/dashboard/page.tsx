@@ -1,3 +1,5 @@
+// Dashboard Page
+
 "use client";
 import { Navbar } from "@/components/navbar";
 import { useState, useEffect } from "react";
@@ -7,48 +9,76 @@ import ProfileCard from "@/components/ProfileCard";
 import { EditProfileForm } from "@/components/EditProfileForm";
 import type { ProfileCardProps } from "@/components/ProfileCard";
 
-
 export default function Dashboard() {
   const [editing, setEditing] = useState(false);
   const [user, setUser] = useState<ProfileCardProps | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+
+  // Load userId from localStorage
   useEffect(() => {
     const profile = localStorage.getItem("userProfile");
     if (profile) {
       const parsed = JSON.parse(profile);
       setUserId(parsed.userid || parsed.id);
-
-      console.log(
-        "Loaded userId from localStorage:",
-        parsed.userid || parsed.id
-      );
     }
   }, []);
 
+  // Fetch user data + signed profile picture URL
   useEffect(() => {
     if (!userId) return;
+
     async function fetchUser() {
       const res = await fetch(`/api/user/${userId}`);
-      console.log("Fetching user for userId:", userId, "Status:", res.status);
-      if (res.ok) {
-        const user = await res.json();
-        console.log("Fetched user from API:", user);
-        setUser({
-          name: user.name,
-          email: user.email,
-          college: user.college,
-          graduation: user.graduation,
-          userid: user.id || user.userid,
-          skills: user.skills,
-          projects: user.projects,
-          profilepictureUrl: user.image ? `/uploads/${user.image}` : undefined,
-          resumeUrl: user.resumePath,
-          website: user.website,
-        });
-      } else {
+      if (!res.ok) {
         console.log("API returned error status:", res.status);
+        return;
       }
+
+      const userData = await res.json();
+      console.log("API Response:", userData); // Debug log
+
+      let profileUrl: string | undefined;
+
+      // Handle profile picture - check both possible field names
+      const profilePicturePath = userData.profilePicturePath || userData.image;
+      
+      if (profilePicturePath) {
+        try {
+          const picRes = await fetch(`/api/profile-picture/${profilePicturePath}`);
+          if (picRes.ok) {
+            const data = await picRes.json();
+            profileUrl = data.url;
+          } else {
+            console.log("Failed to get signed URL for profile picture");
+          }
+        } catch (err) {
+          console.error("Error fetching signed URL:", err);
+        }
+      }
+
+      // Handle the nested structure from API
+      const userInfo = userData.user || userData; // Fallback to userData if no nested user
+      const careerInfo = userData; // The career profile data
+
+      setUser({
+        // Use data from nested user object or fallback to career profile
+        name: userInfo.name || `${userInfo.firstName || ''} ${userInfo.lastName || ''}`.trim() || 'Name not set',
+        email: userInfo.email || 'Email not set',
+        
+        // Use data from career profile
+        college: careerInfo.college || 'College not set',
+        graduation: careerInfo.graduation || 'Graduation not set',
+        userid: careerInfo.studentId || userInfo.id || userId,
+        skills: careerInfo.skills || [],
+        projects: careerInfo.projects || [],
+        
+        // Handle file paths
+        profilepictureUrl: profileUrl,
+        resumeUrl: careerInfo.resumePath,
+        website: careerInfo.website,
+      });
     }
+
     fetchUser();
   }, [userId, editing]);
 
@@ -59,15 +89,18 @@ export default function Dashboard() {
       <main className="dashboard-bg p-4 pl-10">
         <h1 className="text-3xl font-bold mb-6 text-white">Profile</h1>
         {editing ? (
-          <EditProfileForm onCancel={() => setEditing(false)} />
+          <EditProfileForm onCancel={() => setEditing(false)} userId={userId || undefined} />
         ) : (
           <>
             {user ? (
               <>
                 <ProfileCard {...user} />
+
                 {user.resumeUrl && (
-                  <div id="resume-preview"className="mt-8 bg-white rounded shadow p-6">
-                    {/* Resume section */}
+                  <div
+                    id="resume-preview"
+                    className="mt-8 bg-white rounded shadow p-6"
+                  >
                     <h2 className="text-xl font-semibold mb-4 text-gray-800">
                       Resume
                     </h2>
@@ -83,7 +116,7 @@ export default function Dashboard() {
                       href={`/api/resume-download/${user.resumeUrl}`}
                       download
                       target="_blank"
-                      rel="noopener nonreferrer"
+                      rel="noopener noreferrer"
                       className="inline-block px-4 py-2 bg-blue-600 text-white rounded"
                     >
                       Download Resume

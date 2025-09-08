@@ -1,3 +1,5 @@
+// Edit Profile form
+
 "use client";
 
 import { z } from "zod";
@@ -123,7 +125,7 @@ export function EditProfileForm({ onCancel, userId }: { onCancel?: () => void; u
           return;
         }
         const result = await res.json();
-        profilepicturePath = result.publicUrl;
+        profilepicturePath = result.fileName;;
       }
       
       // Upload resume file
