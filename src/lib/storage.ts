@@ -37,3 +37,22 @@ export const downloadFile = async(resumePath: string) =>{
     filename: resumePath
   };
 }
+
+// Profile picture uploads
+export const uploadProfilePicture = async (file: File) => {
+  const fileName = `${Date.now()}-${file.name}`;
+  const blob = bucket.file(fileName);
+
+  const arrayBuffer = await file.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+
+  await blob.save(buffer, { contentType: file.type });
+
+  // Return a signed URL or permanent public URL
+  const [url] = await blob.getSignedUrl({
+    action: 'read',
+    expires: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
+  });
+
+  return { fileName, url };
+};

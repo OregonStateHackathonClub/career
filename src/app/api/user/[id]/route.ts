@@ -1,26 +1,33 @@
 import prisma from '@/lib/prisma';
 import { NextResponse } from 'next/server';
+import { auth } from '@/lib/auth';
+
 
 // GET: Retrieve user and their career profile by student ID
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id: studentId } = await params;
-  
-  if (!studentId || studentId.trim() === '') {
-    return NextResponse.json({ error: 'Invalid student id' }, { status: 400 });
+
+  const session = await auth.api.getSession({
+    headers: request.headers
+  });
+
+  if (!session) {
+    return NextResponse.json({ eror: "Unauthorized" }, { status: 401 });
   }
 
+
+  const userId = session.user.id;
+  
   try {
-    // TODO
+    
     const user = await prisma.user.findUnique({
-      where: { id: "122334489" }
-    })
+      where: { id: userId },
+    });
     
     
     if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     const careerProfile = await prisma.careerProfile.findFirst({
@@ -61,11 +68,14 @@ export async function POST(
       );
     }
 
-    // TODO
-    const user = await prisma.user.findUnique({
-      where: { id: "122334489" }
-    })
-    
+    const session = await auth.api.getSession({ headers: request.headers });
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const userId = session.user.id;
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -138,11 +148,14 @@ export async function PUT(
       );
     }
 
-    const user = await prisma.user.findUnique({
-      where: { id: "122334489" }
-    })
-    
-    
+    const session = await auth.api.getSession({ headers: request.headers });
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const userId = session.user.id;
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
