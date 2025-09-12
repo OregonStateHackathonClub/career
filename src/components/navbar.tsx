@@ -18,7 +18,7 @@ export const Navbar = () => {
         <Link href="/user-dashboard" className="text-lg hover:text-gray-300 transition-colors">
           Discover
         </Link>
-        <Link href="/profile" className="text-lg hover:text-gray-300 transition-colors">
+        <Link href="/dashboard" className="text-lg hover:text-gray-300 transition-colors">
           Profile
         </Link>
       </nav>
