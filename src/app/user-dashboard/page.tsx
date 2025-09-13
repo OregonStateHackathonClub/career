@@ -108,7 +108,7 @@ export default function UserDashboard() {
                     <span className="text-white">Skills: </span>
                     <span className="text-white/60">{user.skills.join(", ")}</span>
                   </p>
-                  <a href={`/api/resume-download/${user.resumePath}?t=${Date.now()}`} download target="_blank" rel="noopener noreferrer">
+                  <a href={`/api/resume-download/${user.resumePath}`} download target="_blank" rel="noopener noreferrer">
                     <button className="rounded-md hover:scale-105 duration-300 border border-white/60 px-4 py-2 mt-4 cursor-pointer">Download Resume</button>
                   </a>
                 </div>
