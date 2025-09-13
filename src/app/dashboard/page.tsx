@@ -3,6 +3,7 @@
 "use client";
 import { Navbar } from "@/components/navbar";
 import { useState, useEffect } from "react";
+import { authClient } from "@/lib/auth-client";
 import React from "react";
 
 import ProfileCard from "@/components/ProfileCard";
@@ -14,13 +15,17 @@ export default function Dashboard() {
   const [user, setUser] = useState<ProfileCardProps | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
 
-  // Load userId from localStorage
+  // Load userId from authClient
   useEffect(() => {
-    const profile = localStorage.getItem("userProfile");
-    if (profile) {
-      const parsed = JSON.parse(profile);
-      setUserId(parsed.userid || parsed.id);
+    async function loadUserId() {
+      const session = await authClient.getSession();
+      if (session.data?.user?.id) {
+        setUserId(session.data.user.id);
+      } else {
+        console.error("No user id found in session");
+      }
     }
+    loadUserId();
   }, []);
 
   // Fetch user data + signed profile picture URL

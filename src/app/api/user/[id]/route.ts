@@ -17,6 +17,8 @@ export async function GET(
   }
 
   const userId = session.user.id;
+
+  console.log(userId)
   
   try {
     
