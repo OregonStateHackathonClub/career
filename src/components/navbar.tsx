@@ -15,7 +15,7 @@ export const Navbar = () => {
       try {
         const session = await authClient.getSession();
         setIsAuthenticated(!!session.data?.user);
-      } catch (err) {
+      } catch {
         setIsAuthenticated(false);
       }
     }
