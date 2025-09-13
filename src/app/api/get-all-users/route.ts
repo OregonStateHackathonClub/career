@@ -3,13 +3,12 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    const users = await prisma.user.findMany({ include: { careerProfile: true } });
-    const careerProfiles: object[] = [];
-
-    users.forEach(user => {
-      if (!user.careerProfile)
-        return;
-      careerProfiles.push({ ...user.careerProfile, name: user.name });
+    const careerProfiles = await prisma.careerProfile.findMany({
+      include: {
+        user: {
+          include: { sessions: true }
+        }
+      }
     });
 
     return NextResponse.json({ careerProfiles: careerProfiles });

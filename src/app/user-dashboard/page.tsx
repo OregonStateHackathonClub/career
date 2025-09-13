@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
+import Image from "next/image";
 import { Search, User } from "lucide-react"
 
 import { Navbar } from "@/components/navbar";
@@ -11,7 +12,11 @@ import { CareerProfile } from "@prisma/client"
 // Interface for the user object which has the CareerProfile info of a user, 
 // as well as some other attributes not in CareerProfile
 interface User extends CareerProfile {
-  name: string
+  profilepictureUrl: string,
+  user: {
+    name: string
+  },
+  image: string
 }
 
 const ITEMS_PER_PAGE = 8
@@ -22,19 +27,49 @@ export default function UserDashboard() {
   const [users, setUsers] = useState<User[] | null>(null)
 
   useEffect(() => {
-    fetch('/api/get-all-users')
-      .then((res) => res.json())
-      .then((data) => {
-        setUsers(data.careerProfiles)
-      })
-  }, [])
+    async function fetchUsers() {
+      const res = await fetch('/api/get-all-users');
+      const data = await res.json();
+
+      // For each user, fetch their signed profile picture URL
+      const usersWithSignedUrls = await Promise.all(
+        data.careerProfiles.map(async (user: User) => {
+          let profileUrl;
+
+          if (user.profilePicturePath || user.image) {
+            try {
+              const picRes = await fetch(
+                `/api/profile-picture/${user.profilePicturePath || user.image}`
+              );
+              if (picRes.ok) {
+                const { url } = await picRes.json();
+                profileUrl = url;
+              }
+            } catch (err) {
+              console.error("Error fetching signed URL:", err);
+            }
+          }
+
+          return {
+            ...user,
+            profilepictureUrl: profileUrl,
+          };
+        })
+      );
+
+      setUsers(usersWithSignedUrls);
+    }
+
+    fetchUsers();
+  }, []);
+
 
   // Filter users based on search term
   const filteredUsers = useMemo(() => {
     if (!users) return []
 
     if (searchTerm) 
-      return users.filter((user) => user.name.toLowerCase().includes(searchTerm.toLowerCase()))
+      return users.filter((profile) => profile.user.name.toLowerCase().includes(searchTerm.toLowerCase()))
     else return users
   }, [users, searchTerm])
 
@@ -74,41 +109,32 @@ export default function UserDashboard() {
 
         {/* Profile Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          {currentUsers.map((user) => {
-            console.log(user)
-            let resumePath;
-            
-            fetch(`/api/resume-download/${user.resumePath}`)
-              .then(data => {
-                resumePath = data
-              });
-
-            console.log(resumePath)
-
+          {currentUsers.map((profile) => {
+            console.log(profile)
             return (
-              <div key={user.id} className="duration-300 relative bg-primary hover:before:opacity-10 before:pointer-events-none before:absolute before:inset-0 before:bg-white before:opacity-0 border-gray-500 bg-primary text-gray-100 rounded-lg p-6 flex gap-4">
+              <div key={profile.id} className="duration-300 relative bg-primary hover:before:opacity-10 before:pointer-events-none before:absolute before:inset-0 before:bg-white before:opacity-0 border-gray-500 bg-primary text-gray-100 rounded-lg p-6 flex gap-4">
                 <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center flex-shrink-0">
-                  <User className="w-8 h-8 text-gray-400" />
+                  <Image width={64} height={64} src={`${profile.profilepictureUrl}`} alt={"hi"} className="rounded-full" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-bold text-lg mb-1 text-white">{user.name}</h3>
+                  <h3 className="font-bold text-lg mb-1 text-white">{profile.user.name}</h3>
                   <p className="text-sm mb-1 text-white">
                     <span className="text-white">ID: </span>
-                    <span className="text-white/60">{user.userId}</span>
+                    <span className="text-white/60">{profile.userId}</span>
                   </p>
                   <p className="text-sm mb-1 text-white">
                     <span className="text-white">College: </span>
-                    <span className="text-white/60">{user.college}</span>
+                    <span className="text-white/60">{profile.college}</span>
                   </p>
                   <p className="text-sm mb-1 text-white">
                     <span className="text-white">Graduation Year: </span>
-                    <span className="text-white/60">{user.graduation}</span>
+                    <span className="text-white/60">{profile.graduation}</span>
                   </p>
                   <p className="text-sm mb-1 text-white">
                     <span className="text-white">Skills: </span>
-                    <span className="text-white/60">{user.skills.join(", ")}</span>
+                    <span className="text-white/60">{profile.skills.join(", ")}</span>
                   </p>
-                  <a href={`/api/resume-download/${user.resumePath}`} download target="_blank" rel="noopener noreferrer">
+                  <a href={`/api/resume-download/${profile.resumePath}`} download target="_blank" rel="noopener noreferrer">
                     <button className="rounded-md hover:scale-105 duration-300 border border-white/60 px-4 py-2 mt-4 cursor-pointer">Download Resume</button>
                   </a>
                 </div>

@@ -20,6 +20,7 @@ export type ProfileCardProps = {
 };
 
 function ProfileCard(props: ProfileCardProps) {
+  console.log(props.profilepictureUrl)
   return (
     <div className="card">
       <div className="image-fields-container"> 
