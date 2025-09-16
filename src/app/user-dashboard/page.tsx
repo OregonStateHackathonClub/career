@@ -128,7 +128,7 @@ export default function UserDashboard() {
                   <h3 className="font-bold text-lg mb-1 text-white">{profile.user.name}</h3>
                   <p className="text-sm mb-1 text-white">
                     <span className="text-white">ID: </span>
-                    <span className="text-white/60">{profile.userId}</span>
+                    <span className="text-white/60">{profile.studentId}</span>
                   </p>
                   <p className="text-sm mb-1 text-white">
                     <span className="text-white">College: </span>
