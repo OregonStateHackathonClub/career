@@ -1,72 +1,77 @@
 // Dashboard Page
 
-"use client"
-import { Navbar } from "@/components/navbar"
-import { useState, useEffect } from "react"
-import { authClient } from "@/lib/auth-client"
+"use client";
+import { Navbar } from "@/components/navbar";
+import { useState, useEffect } from "react";
+import { authClient } from "@/lib/auth-client";
 
-import ProfileCard from "@/components/ProfileCard"
-import { EditProfileForm } from "@/components/EditProfileForm"
-import type { ProfileCardProps } from "@/components/ProfileCard"
+import ProfileCard from "@/components/ProfileCard";
+import { EditProfileForm } from "@/components/EditProfileForm";
+import type { ProfileCardProps } from "@/components/ProfileCard";
 
 export default function Dashboard() {
-  const [editing, setEditing] = useState(false)
-  const [user, setUser] = useState<ProfileCardProps | null>(null)
-  const [userId, setUserId] = useState<string | null>(null)
+  const [editing, setEditing] = useState(false);
+  const [user, setUser] = useState<ProfileCardProps | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
 
   // Load userId from authClient
   useEffect(() => {
     async function loadUserId() {
-      const session = await authClient.getSession()
+      const session = await authClient.getSession();
       if (session.data?.user?.id) {
-        setUserId(session.data.user.id)
+        setUserId(session.data.user.id);
       } else {
-        console.error("No user id found in session")
+        console.error("No user id found in session");
       }
     }
-    loadUserId()
-  }, [])
+    loadUserId();
+  }, []);
 
   // Fetch user data + signed profile picture URL
   useEffect(() => {
-    if (!userId) return
+    if (!userId) return;
 
     async function fetchUser() {
-      const res = await fetch(`/api/user/${userId}`)
+      const res = await fetch(`/api/user/${userId}`);
       if (!res.ok) {
-        console.log("API returned error status:", res.status)
-        return
+        console.log("API returned error status:", res.status);
+        return;
       }
 
-      const userData = await res.json()
-      console.log("API Response:", userData) // Debug log
+      const userData = await res.json();
+      console.log("API Response:", userData); // Debug log
 
-      let profileUrl: string | undefined
+      let profileUrl: string | undefined;
 
       // Handle profile picture - check both possible field names
-      const profilePicturePath = userData.profilePicturePath || userData.image
+      const profilePicturePath = userData.profilePicturePath || userData.image;
 
       if (profilePicturePath) {
         try {
-          const picRes = await fetch(`/api/profile-picture/${profilePicturePath}`)
+          const picRes = await fetch(
+            `/api/profile-picture/${profilePicturePath}`,
+          );
           if (picRes.ok) {
-            const data = await picRes.json()
-            profileUrl = data.url
+            const data = await picRes.json();
+            profileUrl = data.url;
           } else {
-            console.log("Failed to get signed URL for profile picture")
+            console.log("Failed to get signed URL for profile picture");
           }
         } catch (err) {
-          console.error("Error fetching signed URL:", err)
+          console.error("Error fetching signed URL:", err);
         }
       }
 
       // Handle the nested structure from API
-      const userInfo = userData.user || userData // Fallback to userData if no nested user
-      const careerInfo = userData // The career profile data
+      const userInfo = userData.user || userData; // Fallback to userData if no nested user
+      const careerInfo = userData; // The career profile data
 
       setUser({
         // Use data from nested user object or fallback to career profile
-        name: userInfo.name || `${userInfo.firstName || ""} ${userInfo.lastName || ""}`.trim() || "Name not set",
+        name:
+          userInfo.name ||
+          `${userInfo.firstName || ""} ${userInfo.lastName || ""}`.trim() ||
+          "Name not set",
         email: userInfo.email || "Email not set",
 
         // Use data from career profile
@@ -80,20 +85,25 @@ export default function Dashboard() {
         profilepictureUrl: profileUrl,
         resumeUrl: careerInfo.resumePath,
         website: careerInfo.website,
-      })
+      });
     }
 
-    fetchUser()
-  }, [userId, editing])
+    fetchUser();
+  }, [userId, editing]);
 
   return (
     <>
       <Navbar />
 
       <main className="dashboard-bg p-4 pl-10">
-        <h1 className="text-3xl font-bold mb-8 text-white text-center">Profile</h1>
+        <h1 className="text-3xl font-bold mb-8 text-white text-center">
+          Profile
+        </h1>
         {editing ? (
-          <EditProfileForm onCancel={() => setEditing(false)} userId={userId || undefined} />
+          <EditProfileForm
+            onCancel={() => setEditing(false)}
+            userId={userId || undefined}
+          />
         ) : (
           <>
             {user ? (
@@ -117,7 +127,9 @@ export default function Dashboard() {
                   <div className="w-full max-w-4xl mx-auto">
                     <div className="bg-black border border-gray-800 rounded-lg p-6">
                       <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-xl font-semibold text-white">Resume</h2>
+                        <h2 className="text-xl font-semibold text-white">
+                          Resume
+                        </h2>
                         <a
                           href={`/api/resume-download/${user.resumeUrl}`}
                           download
@@ -143,11 +155,13 @@ export default function Dashboard() {
                 )}
               </div>
             ) : (
-              <p className="text-white">No user profile found. Please edit your profile.</p>
+              <p className="text-white">
+                No user profile found. Please edit your profile.
+              </p>
             )}
           </>
         )}
       </main>
     </>
-  )
+  );
 }

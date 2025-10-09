@@ -8,19 +8,27 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 
 // for the image part
-const MAX_FILE_SIZE = 5 * 1024 * 1024
-const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
+const ACCEPTED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/webp",
+];
 
 const imageUploadSchema = z
   .any()
   .refine(
     (files) => files && files.length === 1 && files[0] instanceof File,
-    "Input not instance of File"
+    "Input not instance of File",
   )
-  .refine((files) => files && files[0]?.size <= MAX_FILE_SIZE,
-    `Max image size is ${MAX_FILE_SIZE / (1024 * 1024)}MB.`)
-  .refine((files) => files && ACCEPTED_IMAGE_TYPES.includes(files[0]?.type),
-    "Only .jpg, jpeg, .png and .webp formats are supported."
+  .refine(
+    (files) => files && files[0]?.size <= MAX_FILE_SIZE,
+    `Max image size is ${MAX_FILE_SIZE / (1024 * 1024)}MB.`,
+  )
+  .refine(
+    (files) => files && ACCEPTED_IMAGE_TYPES.includes(files[0]?.type),
+    "Only .jpg, jpeg, .png and .webp formats are supported.",
   );
 
 const formSchema = z.object({
@@ -31,23 +39,30 @@ const formSchema = z.object({
   userid: z.string().min(2).max(10),
   skills: z.string().min(1),
   projects: z.array(
-    z.object({ name: z.string().min(1), link: z.string().url() })
+    z.object({ name: z.string().min(1), link: z.string().url() }),
   ),
   website: z.string().url({ message: "A valid URL is required." }).optional(),
   resume: z
     .any()
-      .refine((files) => 
-        files && 
-      files.length === 1 &&
-        files[0]?.type === "application/pdf", {
-          message: "Please upload a pdf",
-      }),
+    .refine(
+      (files) =>
+        files && files.length === 1 && files[0]?.type === "application/pdf",
+      {
+        message: "Please upload a pdf",
+      },
+    ),
   profilepicture: imageUploadSchema.optional(),
 });
-  
+
 type FormData = z.infer<typeof formSchema>;
 
-export function EditProfileForm({ onCancel, userId }: { onCancel?: () => void; userId?: string }) {
+export function EditProfileForm({
+  onCancel,
+  userId,
+}: {
+  onCancel?: () => void;
+  userId?: string;
+}) {
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -57,13 +72,13 @@ export function EditProfileForm({ onCancel, userId }: { onCancel?: () => void; u
     handleSubmit,
     setValue,
     formState: { errors },
-  } = useForm<FormData>({ 
-    resolver: zodResolver(formSchema), 
-    defaultValues: { projects: [{ name: "", link: ""}]}, // we're starting with one empty project
+  } = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: { projects: [{ name: "", link: "" }] }, // we're starting with one empty project
   });
 
   // field array for the projects
-  const {fields, append, remove } = useFieldArray({
+  const { fields, append, remove } = useFieldArray({
     control,
     name: "projects",
   });
@@ -78,7 +93,7 @@ export function EditProfileForm({ onCancel, userId }: { onCancel?: () => void; u
           if (res.ok) {
             const userData = await res.json();
             setIsEditing(true);
-            
+
             // Populate form with existing data
             setValue("name", userData.name || "");
             setValue("email", userData.email || "");
@@ -88,7 +103,6 @@ export function EditProfileForm({ onCancel, userId }: { onCancel?: () => void; u
             setValue("skills", userData.skills?.join(", ") || "");
             setValue("projects", userData.projects || [{ name: "", link: "" }]);
             setValue("website", userData.website || "");
-            
           } else if (res.status === 404) {
             // User doesn't exist, we'll create them
             setIsEditing(false);
@@ -109,10 +123,10 @@ export function EditProfileForm({ onCancel, userId }: { onCancel?: () => void; u
 
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
-    
+
     try {
       // upload profile picture
-      let profilepicturePath = ""
+      let profilepicturePath = "";
       if (data.profilepicture && data.profilepicture[0]) {
         const formData = new FormData();
         formData.append("file", data.profilepicture[0]);
@@ -125,11 +139,11 @@ export function EditProfileForm({ onCancel, userId }: { onCancel?: () => void; u
           return;
         }
         const result = await res.json();
-        profilepicturePath = result.fileName;;
+        profilepicturePath = result.fileName;
       }
-      
+
       // Upload resume file
-      let resumePath = ""
+      let resumePath = "";
       if (data.resume && data.resume[0]) {
         const formData = new FormData();
         formData.append("file", data.resume[0]);
@@ -174,16 +188,22 @@ export function EditProfileForm({ onCancel, userId }: { onCancel?: () => void; u
       if (res.ok) {
         // Save to localStorage and update state
         localStorage.setItem("userProfile", JSON.stringify(result));
-        console.log(`${isEditing ? 'Updated' : 'Created'} user profile:`, result);
+        console.log(
+          `${isEditing ? "Updated" : "Created"} user profile:`,
+          result,
+        );
         console.log("Saved userId:", result.userid || result.id);
-        
+
         // Show success message
-        alert(`Profile ${isEditing ? 'updated' : 'created'} successfully!`);
-        
+        alert(`Profile ${isEditing ? "updated" : "created"} successfully!`);
+
         // Redirect to dashboard
         window.location.href = "/dashboard";
       } else {
-        alert(result.error || `Failed to ${isEditing ? 'update' : 'create'} profile`);
+        alert(
+          result.error ||
+            `Failed to ${isEditing ? "update" : "create"} profile`,
+        );
       }
     } catch (error) {
       console.error("Error submitting form:", error);
@@ -205,7 +225,9 @@ export function EditProfileForm({ onCancel, userId }: { onCancel?: () => void; u
             {isEditing ? "Edit Profile" : "Create Profile"}
           </h1>
           <p className="text-neutral-500 text-lg">
-            {isEditing ? "Update your information below" : "Tell us about yourself"}
+            {isEditing
+              ? "Update your information below"
+              : "Tell us about yourself"}
           </p>
         </div>
 
@@ -219,51 +241,77 @@ export function EditProfileForm({ onCancel, userId }: { onCancel?: () => void; u
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-3">
-                  <label className="block text-sm font-medium text-neutral-400">Name</label>
+                  <label className="block text-sm font-medium text-neutral-400">
+                    Name
+                  </label>
                   <input
                     type="text"
                     {...register("name")}
                     className="w-full px-4 py-3 bg-neutral-900 border border-neutral-700 rounded-xl text-white placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-neutral-600 focus:border-neutral-600 transition-all duration-200 hover:border-neutral-600"
                     placeholder="Enter your full name"
                   />
-                  {errors.name && <p className="text-red-400 text-sm mt-1">{errors.name.message}</p>}
+                  {errors.name && (
+                    <p className="text-red-400 text-sm mt-1">
+                      {errors.name.message}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-3">
-                  <label className="block text-sm font-medium text-neutral-400">Email</label>
+                  <label className="block text-sm font-medium text-neutral-400">
+                    Email
+                  </label>
                   <input
                     type="email"
                     {...register("email")}
                     className="w-full px-4 py-3 bg-neutral-900 border border-neutral-700 rounded-xl text-white placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-neutral-600 focus:border-neutral-600 transition-all duration-200 hover:border-neutral-600"
                     placeholder="your.email@example.com"
                   />
-                  {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email.message}</p>}
+                  {errors.email && (
+                    <p className="text-red-400 text-sm mt-1">
+                      {errors.email.message}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-3">
-                  <label className="block text-sm font-medium text-neutral-400">College</label>
+                  <label className="block text-sm font-medium text-neutral-400">
+                    College
+                  </label>
                   <input
                     type="text"
                     {...register("college")}
                     className="w-full px-4 py-3 bg-neutral-900 border border-neutral-700 rounded-xl text-white placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-neutral-600 focus:border-neutral-600 transition-all duration-200 hover:border-neutral-600"
                     placeholder="Your university or college"
                   />
-                  {errors.college && <p className="text-red-400 text-sm mt-1">{errors.college.message}</p>}
+                  {errors.college && (
+                    <p className="text-red-400 text-sm mt-1">
+                      {errors.college.message}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-3">
-                  <label className="block text-sm font-medium text-neutral-400">Graduation</label>
+                  <label className="block text-sm font-medium text-neutral-400">
+                    Graduation
+                  </label>
                   <input
                     type="text"
                     {...register("graduation")}
                     className="w-full px-4 py-3 bg-neutral-900 border border-neutral-700 rounded-xl text-white placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-neutral-600 focus:border-neutral-600 transition-all duration-200 hover:border-neutral-600"
                     placeholder="Spring 2027"
                   />
-                  {errors.graduation && <p className="text-red-400 text-sm mt-1">{errors.graduation.message}</p>}
+                  {errors.graduation && (
+                    <p className="text-red-400 text-sm mt-1">
+                      {errors.graduation.message}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-3">
-                  <label className="block text-sm font-medium text-neutral-400">Student ID</label>
+                  <label className="block text-sm font-medium text-neutral-400">
+                    Student ID
+                  </label>
                   <input
                     type="text"
                     {...register("userid")}
@@ -271,12 +319,19 @@ export function EditProfileForm({ onCancel, userId }: { onCancel?: () => void; u
                     placeholder="Your school ID"
                     readOnly={isEditing}
                   />
-                  {errors.userid && <p className="text-red-400 text-sm mt-1">{errors.userid.message}</p>}
+                  {errors.userid && (
+                    <p className="text-red-400 text-sm mt-1">
+                      {errors.userid.message}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-3">
                   <label className="block text-sm font-medium text-neutral-400">
-                    Website <span className="text-neutral-600 font-normal">(optional)</span>
+                    Website{" "}
+                    <span className="text-neutral-600 font-normal">
+                      (optional)
+                    </span>
                   </label>
                   <input
                     type="url"
@@ -284,51 +339,73 @@ export function EditProfileForm({ onCancel, userId }: { onCancel?: () => void; u
                     className="w-full px-4 py-3 bg-neutral-900 border border-neutral-700 rounded-xl text-white placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-neutral-600 focus:border-neutral-600 transition-all duration-200 hover:border-neutral-600"
                     placeholder="https://your-website.com"
                   />
-                  {errors.website && <p className="text-red-400 text-sm mt-1">{errors.website.message}</p>}
+                  {errors.website && (
+                    <p className="text-red-400 text-sm mt-1">
+                      {errors.website.message}
+                    </p>
+                  )}
                 </div>
               </div>
 
               <div className="space-y-3">
-                <label className="block text-sm font-medium text-neutral-400">Skills</label>
+                <label className="block text-sm font-medium text-neutral-400">
+                  Skills
+                </label>
                 <input
                   type="text"
                   {...register("skills")}
                   className="w-full px-4 py-3 bg-neutral-900 border border-neutral-700 rounded-xl text-white placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-neutral-600 focus:border-neutral-600 transition-all duration-200 hover:border-neutral-600"
                   placeholder="JavaScript, React, Node.js, Python (comma separated)"
                 />
-                {errors.skills && <p className="text-red-400 text-sm mt-1">{errors.skills.message}</p>}
+                {errors.skills && (
+                  <p className="text-red-400 text-sm mt-1">
+                    {errors.skills.message}
+                  </p>
+                )}
               </div>
             </div>
 
             {/* File Uploads Section */}
             <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-neutral-300 border-b border-neutral-700 pb-3">Documents</h2>
+              <h2 className="text-xl font-semibold text-neutral-300 border-b border-neutral-700 pb-3">
+                Documents
+              </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-3">
-                  <label className="block text-sm font-medium text-neutral-400">Resume (PDF)</label>
+                  <label className="block text-sm font-medium text-neutral-400">
+                    Resume (PDF)
+                  </label>
                   <input
                     type="file"
                     accept="application/pdf"
                     {...register("resume")}
                     className="w-full px-4 py-3 bg-neutral-900 border border-neutral-700 rounded-xl text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-neutral-700 file:text-white file:font-medium hover:file:bg-neutral-600 transition-all duration-200 hover:border-neutral-600"
                   />
-                  {errors.resume && typeof errors.resume.message === "string" && (
-                    <p className="text-red-400 text-sm mt-1">{errors.resume.message}</p>
-                  )}
+                  {errors.resume &&
+                    typeof errors.resume.message === "string" && (
+                      <p className="text-red-400 text-sm mt-1">
+                        {errors.resume.message}
+                      </p>
+                    )}
                 </div>
 
                 <div className="space-y-3">
-                  <label className="block text-sm font-medium text-neutral-400">Profile Picture</label>
+                  <label className="block text-sm font-medium text-neutral-400">
+                    Profile Picture
+                  </label>
                   <input
                     type="file"
                     accept={ACCEPTED_IMAGE_TYPES.join(",")}
                     {...register("profilepicture")}
                     className="w-full px-4 py-3 bg-neutral-900 border border-neutral-700 rounded-xl text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-neutral-700 file:text-white file:font-medium hover:file:bg-neutral-600 transition-all duration-200 hover:border-neutral-600"
                   />
-                  {errors.profilepicture && typeof errors.profilepicture.message === "string" && (
-                    <p className="text-red-400 text-sm mt-1">{errors.profilepicture.message}</p>
-                  )}
+                  {errors.profilepicture &&
+                    typeof errors.profilepicture.message === "string" && (
+                      <p className="text-red-400 text-sm mt-1">
+                        {errors.profilepicture.message}
+                      </p>
+                    )}
                 </div>
               </div>
             </div>
@@ -336,7 +413,9 @@ export function EditProfileForm({ onCancel, userId }: { onCancel?: () => void; u
             {/* Projects Section */}
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-neutral-300">Projects</h2>
+                <h2 className="text-xl font-semibold text-neutral-300">
+                  Projects
+                </h2>
                 <button
                   type="button"
                   onClick={() => append({ name: "", link: "" })}
@@ -360,7 +439,9 @@ export function EditProfileForm({ onCancel, userId }: { onCancel?: () => void; u
                           className="w-full px-4 py-3 bg-neutral-800 border border-neutral-600 rounded-lg text-white placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:border-neutral-500 transition-all duration-200 hover:border-neutral-500"
                         />
                         {errors.projects?.[index]?.name && (
-                          <p className="text-red-400 text-sm">{errors.projects[index]?.name?.message}</p>
+                          <p className="text-red-400 text-sm">
+                            {errors.projects[index]?.name?.message}
+                          </p>
                         )}
                       </div>
 
@@ -371,7 +452,9 @@ export function EditProfileForm({ onCancel, userId }: { onCancel?: () => void; u
                           className="w-full px-4 py-3 bg-neutral-800 border border-neutral-600 rounded-lg text-white placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:border-neutral-500 transition-all duration-200 hover:border-neutral-500"
                         />
                         {errors.projects?.[index]?.link && (
-                          <p className="text-red-400 text-sm">{errors.projects[index]?.link?.message}</p>
+                          <p className="text-red-400 text-sm">
+                            {errors.projects[index]?.link?.message}
+                          </p>
                         )}
                       </div>
                     </div>
@@ -404,12 +487,16 @@ export function EditProfileForm({ onCancel, userId }: { onCancel?: () => void; u
                 className="px-8 py-3 bg-neutral-700 hover:bg-neutral-600 text-white rounded-xl font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex-1 sm:flex-none shadow-lg transform hover:scale-105"
                 disabled={isLoading}
               >
-                {isLoading ? "Saving..." : isEditing ? "Update Profile" : "Create Profile"}
+                {isLoading
+                  ? "Saving..."
+                  : isEditing
+                    ? "Update Profile"
+                    : "Create Profile"}
               </button>
             </div>
           </div>
         </form>
       </div>
     </div>
-  )
+  );
 }

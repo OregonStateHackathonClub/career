@@ -23,7 +23,7 @@ export default function SignInPage() {
         email,
         password,
         callbackURL: "/dashboard", // where to go after sign in
-        rememberMe: true,          // keep user logged in
+        rememberMe: true, // keep user logged in
       },
       {
         onRequest: () => {
@@ -35,7 +35,7 @@ export default function SignInPage() {
         onError: (ctx) => {
           setError(ctx.error.message);
         },
-      }
+      },
     );
   }
 
@@ -45,7 +45,10 @@ export default function SignInPage() {
 
       <main className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
         <h1 className="text-2xl font-bold mb-6">Sign In</h1>
-        <form onSubmit={handleSubmit} className="bg-ring p-10 rounded shadow w-full max-w-sm">
+        <form
+          onSubmit={handleSubmit}
+          className="bg-ring p-10 rounded shadow w-full max-w-sm"
+        >
           <label className="block mb-2 font-medium">Email</label>
           <input
             type="email"
@@ -62,7 +65,10 @@ export default function SignInPage() {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <button type="submit" className="w-full bg-orange-600 text-white py-2 rounded font-semibold">
+          <button
+            type="submit"
+            className="w-full bg-orange-600 text-white py-2 rounded font-semibold"
+          >
             Sign In
           </button>
           {error && <p className="text-red-600 mt-4">{error}</p>}

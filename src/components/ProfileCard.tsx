@@ -1,29 +1,36 @@
-import Image from "next/image"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Mail, GraduationCap, Globe, Download, ExternalLink, User } from "lucide-react"
+import Image from "next/image";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Mail,
+  GraduationCap,
+  Globe,
+  Download,
+  ExternalLink,
+  User,
+} from "lucide-react";
 
 type Project = {
-  name: string
-  link: string
-}
+  name: string;
+  link: string;
+};
 
 export type ProfileCardProps = {
-  name: string
-  email: string
-  college: string
-  graduation: string
-  userid: string
-  skills: string[]
-  projects: Project[]
-  resumeUrl: string
-  profilepictureUrl?: string
-  website?: string
-}
+  name: string;
+  email: string;
+  college: string;
+  graduation: string;
+  userid: string;
+  skills: string[];
+  projects: Project[];
+  resumeUrl: string;
+  profilepictureUrl?: string;
+  website?: string;
+};
 
 function ProfileCard(props: ProfileCardProps) {
-  console.log(props.profilepictureUrl)
+  console.log(props.profilepictureUrl);
 
   return (
     <Card className="w-full max-w-4xl mx-auto overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 bg-black border-white border">
@@ -50,7 +57,9 @@ function ProfileCard(props: ProfileCardProps) {
 
             {/* Name and Basic Info */}
             <div className="flex-1 text-center sm:text-left">
-              <h2 className="text-2xl font-bold text-white mb-2">{props.name}</h2>
+              <h2 className="text-2xl font-bold text-white mb-2">
+                {props.name}
+              </h2>
 
               <div className="space-y-2">
                 <div className="flex items-center justify-center sm:justify-start gap-2 text-gray-300">
@@ -76,7 +85,11 @@ function ProfileCard(props: ProfileCardProps) {
             <h3 className="text-lg font-semibold text-white mb-3">Skills</h3>
             <div className="flex flex-wrap gap-2">
               {props.skills.map((skill, idx) => (
-                <Badge key={idx} variant="secondary" className="text-xs bg-gray-800 text-gray-200 hover:bg-gray-700">
+                <Badge
+                  key={idx}
+                  variant="secondary"
+                  className="text-xs bg-gray-800 text-gray-200 hover:bg-gray-700"
+                >
                   {skill}
                 </Badge>
               ))}
@@ -127,9 +140,16 @@ function ProfileCard(props: ProfileCardProps) {
                     asChild
                     className="w-full justify-start bg-transparent border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white"
                   >
-                    <a href={`#resume-preview`} className="flex items-center gap-2" title="View resume preview below">
+                    <a
+                      href={`#resume-preview`}
+                      className="flex items-center gap-2"
+                      title="View resume preview below"
+                    >
                       <ExternalLink className="w-4 h-4" />
-                      {decodeURIComponent(props.resumeUrl).replace(/^[0-9]+-/, "")}
+                      {decodeURIComponent(props.resumeUrl).replace(
+                        /^[0-9]+-/,
+                        "",
+                      )}
                     </a>
                   </Button>
                   <Button
@@ -182,7 +202,7 @@ function ProfileCard(props: ProfileCardProps) {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
-export default ProfileCard
+export default ProfileCard;

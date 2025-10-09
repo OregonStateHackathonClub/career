@@ -126,24 +126,21 @@
   border-radius: 12px;
   max-width: 1000px;
   margin: 2em auto;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.08); 
-  padding: 2em; 
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  padding: 2em;
   display: flex;
-  flex-direction:column;
+  flex-direction: column;
   align-items: stretch;
   color: white;
   border-color: #f5590b;
   text-align: left;
   gap: 1rem;
-  
-
 }
 
 .dashboard-bg {
   background-color: black;
   min-height: 100vh;
   width: 100vw;
-
 }
 .edit-profile-heading {
   font-size: 1.75rem;
@@ -164,9 +161,8 @@
   background: var(--form-bg);
   border: 1px solid var(--card-border);
   border-radius: 16px;
-  box-shadow: 0 8px 28px rgba(0,0,0,0.06);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06);
 }
-
 
 .form-group {
   margin-bottom: 0.5rem;
@@ -191,12 +187,11 @@
   line-height: 1.5;
 }
 
-.card-group ul{
+.card-group ul {
   list-style: disc inside;
-
 }
 
-.card-group a{
+.card-group a {
   text-decoration: underline;
 }
 
@@ -204,7 +199,6 @@
   border: 1px solid #ccc;
   margin-bottom: 1em;
   border-radius: 8px;
-
 }
 
 .card-group a[download] {
@@ -220,7 +214,7 @@
 .card-group a[download]:hover {
   background: #1d4ed8;
 }
-.form-input:focus{
+.form-input:focus {
   border-color: #bb460b;
   background-color: #f5e3dc;
 }
@@ -238,7 +232,10 @@
   align-items: center;
 }
 
-.add-btn, .remove-btn, .save-btn, .cancel-btn {
+.add-btn,
+.remove-btn,
+.save-btn,
+.cancel-btn {
   padding: 0.5rem 1rem;
   border: none;
   border-radius: 6px;
@@ -255,7 +252,8 @@
   margin-left: 1rem;
 }
 
-.add-btn:hover, .save-btn:hover {
+.add-btn:hover,
+.save-btn:hover {
   background: #04ad20;
 }
 
@@ -264,20 +262,20 @@
 }
 
 .cancel-btn:hover {
-  background:#545050
+  background: #545050;
 }
 
 .form-actions {
-  display:flex;
+  display: flex;
   gap: 1rem;
   margin-top: 1rem;
-  margin-left: 35%
+  margin-left: 35%;
 }
 
 .beaver-name {
   font-size: 1.25rem;
   font-weight: 700;
-  margin: 0 0 .25rem;
+  margin: 0 0 0.25rem;
   color: white;
 }
 
@@ -293,10 +291,16 @@
 
 .resume-inline-link {
   text-decoration: underline;
-  color: #9ecbff; 
+  color: #9ecbff;
 }
 
-.resume-inline-link:hover { color: #cfe4ff; }
-.resume-sep { color: #aaa; }
+.resume-inline-link:hover {
+  color: #cfe4ff;
+}
+.resume-sep {
+  color: #aaa;
+}
 
-.card-group iframe { display: none; }
+.card-group iframe {
+  display: none;
+}

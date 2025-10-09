@@ -1,15 +1,11 @@
-import prisma from '@/lib/prisma';
-import { NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
-
+import prisma from "@/lib/prisma";
+import { NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
 
 // GET: Retrieve user and their career profile by student ID
-export async function GET(
-  request: Request,
-) {
-
+export async function GET(request: Request) {
   const session = await auth.api.getSession({
-    headers: request.headers
+    headers: request.headers,
   });
 
   if (!session) {
@@ -18,32 +14,34 @@ export async function GET(
 
   const userId = session.user.id;
 
-  console.log(userId)
-  
+  console.log(userId);
+
   try {
-    
     const user = await prisma.user.findUnique({
       where: { id: userId },
     });
-    
+
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     const careerProfile = await prisma.careerProfile.findFirst({
-      where: {  userId: user.id },
+      where: { userId: user.id },
       include: {
         user: {
-          include: { sessions: true }
-        }
-      }
+          include: { sessions: true },
+        },
+      },
     });
-    
+
     if (!careerProfile) {
-      return NextResponse.json({ error: 'Career profile not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "Career profile not found" },
+        { status: 404 },
+      );
     }
-    
-     const responseData = {
+
+    const responseData = {
       // Career profile fields
       ...careerProfile,
       name: careerProfile.user.name,
@@ -56,20 +54,20 @@ export async function GET(
       website: careerProfile.website,
       profilePicturePath: careerProfile.profilePicturePath,
       resumePath: careerProfile.resumePath,
-      user: undefined
+      user: undefined,
     };
-    
+
     return NextResponse.json(responseData);
   } catch (error) {
-    console.error('Database error:', error);
-    return NextResponse.json({ error: 'Server error' }, { status: 500 });
+    console.error("Database error:", error);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
 
 // POST: Create a new career profile for authenticated user
 export async function POST(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { id: studentId } = await params;
 
@@ -79,8 +77,8 @@ export async function POST(
     // Validation for required fields
     if (!body.name || !body.email) {
       return NextResponse.json(
-        { error: 'Name and email are required' }, 
-        { status: 400 }
+        { error: "Name and email are required" },
+        { status: 400 },
       );
     }
 
@@ -93,20 +91,20 @@ export async function POST(
     const user = await prisma.user.findUnique({ where: { id: userId } });
 
     if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Check if career profile already exists for this student ID
     const existingProfile = await prisma.careerProfile.findFirst({
-      where: { 
-        userId: user.id 
-      }
+      where: {
+        userId: user.id,
+      },
     });
 
     if (existingProfile) {
       return NextResponse.json(
-        { error: 'Career profile already exists. Use PUT to update.' }, 
-        { status: 409 }
+        { error: "Career profile already exists. Use PUT to update." },
+        { status: 409 },
       );
     }
 
@@ -126,22 +124,21 @@ export async function POST(
             website: body.website,
             profilePicturePath: body.profilepicturePath,
             resumePath: body.resumePath,
-          }
-        }
+          },
+        },
       },
       include: {
         careerProfile: true,
-        sessions: true
-      }
+        sessions: true,
+      },
     });
 
     return NextResponse.json(updatedUser, { status: 201 });
-    
   } catch (error) {
-    console.error('Career profile creation error:', error);
+    console.error("Career profile creation error:", error);
     return NextResponse.json(
-      { error: 'Career profile creation failed' }, 
-      { status: 500 }
+      { error: "Career profile creation failed" },
+      { status: 500 },
     );
   }
 }
@@ -149,7 +146,7 @@ export async function POST(
 // PUT: Update existing career profile
 export async function PUT(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { id: studentId } = await params;
 
@@ -159,8 +156,8 @@ export async function PUT(
     // Validation for required fields
     if (!body.name || !body.email) {
       return NextResponse.json(
-        { error: 'Name and email are required' }, 
-        { status: 400 }
+        { error: "Name and email are required" },
+        { status: 400 },
       );
     }
 
@@ -173,7 +170,7 @@ export async function PUT(
     const user = await prisma.user.findUnique({ where: { id: userId } });
 
     if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Update user and career profile
@@ -203,23 +200,22 @@ export async function PUT(
               website: body.website,
               profilePicturePath: body.profilepicturePath,
               resumePath: body.resumePath,
-            }
-          }
-        }
+            },
+          },
+        },
       },
       include: {
         careerProfile: true,
-        sessions: true
-      }
+        sessions: true,
+      },
     });
 
     return NextResponse.json(updatedUser);
-    
   } catch (error) {
-    console.error('Career profile update error:', error);
+    console.error("Career profile update error:", error);
     return NextResponse.json(
-      { error: 'Career profile update failed' }, 
-      { status: 500 }
+      { error: "Career profile update failed" },
+      { status: 500 },
     );
   }
 }

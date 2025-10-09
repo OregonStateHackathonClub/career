@@ -7,10 +7,22 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "db:generate": "dotenv -e .env.local -- npx prisma generate",
     "db:push": "dotenv -e .env.local -- npx prisma db push",
     "db:migrate": "dotenv -e .env.local -- npx prisma migrate dev",
-    "db:studio": "dotenv -e .env.local -- npx prisma studio"
+    "db:studio": "dotenv -e .env.local -- npx prisma studio",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx,mjs}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,css,md}": [
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "@google-cloud/storage": "^7.16.0",
@@ -43,7 +55,12 @@
     "autoprefixer": "^10.4.21",
     "eslint": "^9",
     "eslint-config-next": "15.3.4",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.2",
     "postcss": "^8.5.6",
+    "prettier": "^3.6.2",
     "prisma": "^6.12.0",
     "tailwindcss": "^4",
     "tsx": "^4.20.3",
