@@ -1,13 +1,11 @@
 import { downloadFile } from "@/lib/storage";
 import { NextResponse } from "next/server";
 
-export const runtime = "nodejs";
-
 export async function GET(
   req: Request,
-  { params }: { params: Promise<{ filename: string }> },
+  { params }: { params: Promise<{ id: string }> },
 ) {
-  const { filename } = await params;
+  const { id: filename } = await params;
   try {
     const { buffer } = await downloadFile(filename);
 

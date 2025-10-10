@@ -3,15 +3,13 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const careerProfiles = await prisma.careerProfile.findMany({
+    const applications = await prisma.application.findMany({
       include: {
-        user: {
-          include: { sessions: true },
-        },
+        user: true,
       },
     });
 
-    return NextResponse.json({ careerProfiles: careerProfiles });
+    return NextResponse.json({ applications });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: "Server error" }, { status: 500 });

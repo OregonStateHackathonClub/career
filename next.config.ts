@@ -7,7 +7,6 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "storage.googleapis.com",
-        // replace with your actual bucket name
         pathname: "/beaverhacks/**",
       },
     ],
