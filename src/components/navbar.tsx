@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ModeToggle } from "@/components/mode-toggle";
 
 export const Navbar = () => {
   const pathname = usePathname();
@@ -34,16 +35,19 @@ export const Navbar = () => {
           <span className="text-xl font-bold">BeaverHacks Career</span>
         </Link>
 
-        {isSponsorPage && (
-          <Button
-            onClick={handleLogout}
-            variant="outline"
-            className="gap-2 cursor-pointer"
-          >
-            <LogOut className="w-4 h-4" />
-            Logout
-          </Button>
-        )}
+        <div className="flex items-center gap-2">
+          <ModeToggle />
+          {isSponsorPage && (
+            <Button
+              onClick={handleLogout}
+              variant="outline"
+              className="gap-2 cursor-pointer"
+            >
+              <LogOut className="w-4 h-4" />
+              Logout
+            </Button>
+          )}
+        </div>
       </div>
     </header>
   );
