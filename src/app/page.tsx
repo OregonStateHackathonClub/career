@@ -1,92 +1,49 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
+  CardDescription,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+import { Navbar } from "@/components/navbar";
+import { Footer } from "@/components/ui/footer";
+import { motion } from "framer-motion";
 
 export default function Home() {
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setIsLoading(true);
-
-    try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        router.push("/sponsors");
-        router.refresh();
-      } else {
-        setError(data.error || "Invalid password. Please try again.");
-      }
-    } catch (error) {
-      console.error("Login error:", error);
-      setError("An error occurred. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-3xl font-bold">Sponsor Portal</CardTitle>
-          <CardDescription>
-            Enter the password to view attendee profiles
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Enter sponsor password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                disabled={isLoading}
-              />
-            </div>
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-osu-orange/10 via-gray-50 to-white dark:from-[#1a1a1a] dark:via-[#0f0f0f] dark:to-black">
+      <Navbar />
 
-            {error && (
-              <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/50">
-                <p className="text-destructive text-sm">{error}</p>
-              </div>
-            )}
+      <main className="flex-grow flex flex-col items-center justify-center text-center px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="w-full flex justify-center"
+        >
+          <Card className="p-10 max-w-lg w-full rounded-3xl shadow-lg border border-border bg-background/80 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="text-4xl font-bold mb-2">
+                BeaverHacks Career
+              </CardTitle>
+              <CardDescription className="text-base text-muted-foreground mb-6">
+                Empowering innovation, connecting talent.
+              </CardDescription>
+              <Button
+                asChild
+                className="bg-osu-orange hover:bg-osu-orange/90 text-white px-8 py-3 text-lg rounded-full shadow-md transition"
+              >
+                <Link href="/portal">Enter Sponsor Portal</Link>
+              </Button>
+            </CardHeader>
+          </Card>
+        </motion.div>
+      </main>
 
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-osu-orange hover:bg-osu-orange/90"
-            >
-              {isLoading ? "Checking..." : "Access Portal"}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+      <Footer />
     </div>
   );
 }
